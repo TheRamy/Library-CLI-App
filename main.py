@@ -19,7 +19,7 @@ def start():
     typer.secho(f'''Welcome to Library CLI!\n\n
         You can execute command '--help' to see the possible commands''', fg=typer.colors.GREEN)
     # TODO: connect to database
-    print(util.db.example_sql()[1]) # just an example 
+    console.print(util.db.example_sql()[1]) # just an example 
 
 
 

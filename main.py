@@ -19,12 +19,14 @@ def start():
     typer.secho(f'''Welcome to Library CLI!\n\n
         You can execute command '--help' to see the possible commands''', fg=typer.colors.GREEN)
     # TODO: connect to database
-    console.print(util.db.example_sql()[1]) # just an example 
 
+    # util.formating.print_terminal('_') # this prints a line
+    console.print(util.db.example_sql()[1])  # just an example
 
 
 @app.command("sign_up")
-def sign_up(username: str): # This is how you can get arguments, here username is a mandatory argument for this command.
+# This is how you can get arguments, here username is a mandatory argument for this command.
+def sign_up(username: str):
     console.clear()
 
     typer.echo(f"Nice that you are signing up!")
@@ -42,7 +44,8 @@ def display_table():
     table.add_column("Column 1", style="dim", width=10)
     table.add_column("Column 2", style="dim", min_width=10, justify=True)
 
-    table_db = util.db.example_table()
+    # util.db.example_table()
+    table_db = util.db.run_sql("SELECT * FROM cool_table", "fetchall")
     for row in table_db:
         table.add_row(row[1], row[2])
 

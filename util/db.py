@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from rich.table import Table
 
 import psycopg2
 
@@ -22,8 +23,11 @@ def db_config(filename='db.ini', section='database'):
     return db
 
 
-def example_sql():
-    """Just an example by Ramy."""
+def run_sql(sql, fetchType='fetchall', fetchmanyN=5):  # "SELECT * FROM cool_table"
+    """You can use this to query the database with fetchall,
+      fetchone or fetchmany, and returns the result.
+       if fetchmany is used, it will fetch 5 by default. ~Ramy """
+
     try:
 
         # read connection parameters
@@ -35,10 +39,21 @@ def example_sql():
         # create a cursor
         cur = conn.cursor()
 
-        cur.execute("SELECT * FROM test")
-        row = cur.fetchone()
+        cur.execute(sql)
 
-        return row
+        if fetchType == 'fetchall':
+
+            rows = cur.fetchall()
+            return rows
+
+        elif fetchType == "fetchone":
+
+            rows = cur.fetchone()
+            return rows
+        elif fetchType == "fetchmany":
+
+            rows = cur.fetchmany(fetchmanyN)
+            return rows
 
     except (Exception, psycopg2.Error) as error:
         print("error: ", error)
@@ -49,32 +64,15 @@ def example_sql():
             cur.close()
             conn.close()
             # print("PostgreSQL connection is closed")
+
+
+def example_sql():
+    """Just an example by Ramy."""
+
+    return run_sql("SELECT * FROM test", 'fetchone')
 
 
 def example_table():
     """Just an example by Ramy."""
-    try:
 
-        # read connection parameters
-        params = db_config()
-
-        # connect to the PostgreSQL server
-        # print('Connecting to the PostgreSQL database...')
-        conn = psycopg2.connect(**params)
-        # create a cursor
-        cur = conn.cursor()
-
-        cur.execute("SELECT * FROM cool_table")
-        rows = cur.fetchall()
-
-        return rows
-
-    except (Exception, psycopg2.Error) as error:
-        print("error: ", error)
-
-    finally:
-        # closing database connection.
-        if conn:
-            cur.close()
-            conn.close()
-            # print("PostgreSQL connection is closed")
+    return run_sql("SELECT * FROM cool_table", 'fetchall')

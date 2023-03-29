@@ -3,7 +3,7 @@ from configparser import ConfigParser
 import psycopg2
 
 
-def db_config (filename='db.ini', section='database'):
+def db_config(filename='db.ini', section='database'):
     # create a parser
     parser = ConfigParser()
     # read config file
@@ -22,9 +22,7 @@ def db_config (filename='db.ini', section='database'):
     return db
 
 
-
-
-def example_sql ():
+def example_sql():
     """Just an example by Ramy."""
     try:
 
@@ -37,13 +35,10 @@ def example_sql ():
         # create a cursor
         cur = conn.cursor()
 
-    
-    
         cur.execute("SELECT * FROM test")
         row = cur.fetchone()
-        
-        return row
 
+        return row
 
     except (Exception, psycopg2.Error) as error:
         print("error: ", error)
@@ -56,9 +51,7 @@ def example_sql ():
             # print("PostgreSQL connection is closed")
 
 
-
-
-def example_table ():
+def example_table():
     """Just an example by Ramy."""
     try:
 
@@ -71,13 +64,10 @@ def example_table ():
         # create a cursor
         cur = conn.cursor()
 
-    
-    
         cur.execute("SELECT * FROM cool_table")
         rows = cur.fetchall()
-        
-        return rows
 
+        return rows
 
     except (Exception, psycopg2.Error) as error:
         print("error: ", error)
@@ -88,4 +78,3 @@ def example_table ():
             cur.close()
             conn.close()
             # print("PostgreSQL connection is closed")
-

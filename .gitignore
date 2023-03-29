@@ -2,3 +2,5 @@
 *.pyc
 *.ini
 *.sh
+.vscode/settings.json
+_tests.py

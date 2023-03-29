@@ -1,10 +1,13 @@
+import time
 import typer
 from rich.console import Console
 from rich.table import Table
+from rich.progress import Progress
 from typing import Optional
 
 import util.formating
 import util.db
+import util.cli
 
 
 console = Console()
@@ -25,14 +28,19 @@ def start():
 
 
 @app.command("sign_up")
-# This is how you can get arguments, here username is a mandatory argument for this command.
 def sign_up(username: str):
     console.clear()
-
     typer.echo(f"Nice that you are signing up!")
     # TODO: Add user with name {username} to database table
 
-# Example function for tables, you can add more columns/row.
+    util.cli.cli_add_user(username)
+
+
+@app.command("sign_in")
+def sign_in(username: str, password: str):
+    console.clear()
+
+    util.cli.cli_login(username, password)
 
 
 @app.command("display_table")
@@ -45,7 +53,7 @@ def display_table():
     table.add_column("Column 2", style="dim", min_width=10, justify=True)
 
     # util.db.example_table()
-    table_db = util.db.run_sql("SELECT * FROM cool_table", "fetchall")
+    table_db = util.db.sql_select("SELECT * FROM cool_table", "fetchall")
     for row in table_db:
         table.add_row(row[1], row[2])
 
@@ -53,4 +61,5 @@ def display_table():
 
 
 if __name__ == "__main__":
+    console.clear()
     app()

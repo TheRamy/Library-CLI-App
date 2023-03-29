@@ -23,7 +23,7 @@ def db_config(filename='db.ini', section='database'):
     return db
 
 
-def run_sql(sql, fetchType='fetchall', fetchmanyN=5):  # "SELECT * FROM cool_table"
+def sql_select(sql, fetchType='fetchall', fetchmanyN=5):  # "SELECT * FROM cool_table"
     """You can use this to query the database with fetchall,
       fetchone or fetchmany, and returns the result.
        if fetchmany is used, it will fetch 5 by default. ~Ramy """
@@ -66,13 +66,41 @@ def run_sql(sql, fetchType='fetchall', fetchmanyN=5):  # "SELECT * FROM cool_tab
             # print("PostgreSQL connection is closed")
 
 
+def sql_insert(sql):
+    """You can use this to run insert SQL. ~Ramy """
+
+    try:
+
+        # read connection parameters
+        params = db_config()
+
+        # connect to the PostgreSQL server
+        # print('Connecting to the PostgreSQL database...')
+        conn = psycopg2.connect(**params)
+        # create a cursor
+        cur = conn.cursor()
+
+        cur.execute(sql)
+        conn.commit()
+
+    except (Exception, psycopg2.Error) as error:
+        print("error: ", error)
+
+    finally:
+        # closing database connection.
+        if conn:
+            cur.close()
+            conn.close()
+            # print("PostgreSQL connection is closed")
+
+
 def example_sql():
     """Just an example by Ramy."""
 
-    return run_sql("SELECT * FROM test", 'fetchone')
+    return sql_select("SELECT * FROM test", 'fetchone')
 
 
 def example_table():
     """Just an example by Ramy."""
 
-    return run_sql("SELECT * FROM cool_table", 'fetchall')
+    return sql_select("SELECT * FROM cool_table", 'fetchall')

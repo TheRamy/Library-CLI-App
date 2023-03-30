@@ -23,10 +23,10 @@ def db_config(filename='db.ini', section='database'):
     return db
 
 
-def sql_select(sql, fetchType='fetchall', fetchmanyN=5):  # "SELECT * FROM cool_table"
+def sql_select(sql, fetchType='fetchall', fetchmanyN=5):
     """You can use this to query the database with fetchall,
       fetchone or fetchmany, and returns the result.
-       if fetchmany is used, it will fetch 5 by default. ~Ramy """
+       if fetchmany is used, it will fetch 5 by default. ~ramy """
 
     try:
 
@@ -67,7 +67,7 @@ def sql_select(sql, fetchType='fetchall', fetchmanyN=5):  # "SELECT * FROM cool_
 
 
 def sql_insert(sql):
-    """You can use this to run insert SQL. ~Ramy """
+    """You can use this to run insert SQL. ~ramy """
 
     try:
 

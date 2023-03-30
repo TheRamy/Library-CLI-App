@@ -11,6 +11,7 @@ console = Console()
 
 
 def cli_add_user(username):
+    """Displays the cli interface when signing up. ~ramy"""
 
     user_exist = util.db.sql_select(
         f"SELECT * from users WHERE user_name = '{username}'")
@@ -33,6 +34,7 @@ def cli_add_user(username):
 
 
 def cli_login(username, password):
+    """Displays the cli interface whe loging in a user. ~ramy"""
 
     user = util.db.sql_select(
         f"SELECT * from users WHERE user_name = '{username}'")
@@ -42,10 +44,13 @@ def cli_login(username, password):
 
         if password == user_password:  # Check if the password match the one in the database
             typer.secho(f'Logged in! Welcome back {username}!', fg='green')
+            return username
         else:
             typer.secho(
                 f'The password for user {username} is incorrect!', fg='red')
+            return False
 
     else:
 
         typer.secho(f'Username {username} does not exist.', fg='red')
+        return False

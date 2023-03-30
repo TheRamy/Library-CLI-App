@@ -8,47 +8,58 @@ from typing import Optional
 import util.formating
 import util.db
 import util.cli
-
+import util.session
 
 console = Console()
 app = typer.Typer()
+session = util.session.load()
 
 
 @app.command("start")
 def start():
 
-    console.clear()
+    util.formating.show_header()
 
-    typer.secho(f'''Welcome to Library CLI!\n\n
+    typer.secho(f'''Welcome to Library CLI v0.1!\n\n
         You can execute command '--help' to see the possible commands''', fg=typer.colors.GREEN)
+
+    if session:
+        typer.secho(
+            f"Welcome back, {session['username']}!", fg=typer.colors.GREEN)
+    else:
+        typer.secho(f"You are not logged in!", fg=typer.colors.WHITE)
+
     # TODO: connect to database
 
     # util.formating.print_terminal('_') # this prints a line
-    console.print(util.db.example_sql()[1])  # just an example
+    # console.print(util.db.example_sql()[1])  # just an example
 
 
 @app.command("sign_up")
 def sign_up(username: str):
     console.clear()
-    typer.echo(f"Nice that you are signing up!")
 
+    typer.echo(f"Nice that you are signing up!")
     util.cli.cli_add_user(username)
 
 
 @app.command("sign_in")
 def sign_in(username: str, password: str):
-    console.clear()
 
-    util.cli.cli_login(username, password)
+    util.formating.show_header()
+
+    username = util.cli.cli_login(username, password)
+
+    if username:
+        session_id = util.session.login(username)
+        # print (session_id)
 
 
 @app.command("search_by_name")
 def search_by_name(name: str):
 
-
-
     util.formating.show_header()
-    
+
     table = Table(show_header=True, header_style="bold green")
     # table.add_column("Column 1", style="dim", width=10)
     table.add_column("#", style="dim", min_width=10, justify=True)
@@ -91,6 +102,22 @@ def display_table():
     console.print(table)
 
 
+##################################################################
+# Example of a command that require the user to be logged in first!
+##################################################################
+@app.command("add_book")
+def add_book():
+
+    util.formating.show_header()
+
+    if session:
+
+        typer.secho(f"Welcome back, {session['username']}!",  fg='green')
+
+    else:
+        typer.secho("You need to login first.",  fg='red')
+
+
 if __name__ == "__main__":
-    console.clear()
+    console.clear()  # clears the terminal of any text.
     app()

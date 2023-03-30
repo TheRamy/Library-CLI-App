@@ -45,9 +45,11 @@ def sign_in(username: str, password: str):
 @app.command("search_by_name")
 def search_by_name(name: str):
 
-    console.clear()
 
-    table = Table(show_header=True, header_style="bold white")
+
+    util.formating.show_header()
+    
+    table = Table(show_header=True, header_style="bold green")
     # table.add_column("Column 1", style="dim", width=10)
     table.add_column("#", style="dim", min_width=10, justify=True)
     table.add_column("Book ID", style="dim", min_width=10, justify=True)

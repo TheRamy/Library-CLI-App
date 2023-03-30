@@ -1,7 +1,12 @@
 
 import os
+import typer
+from rich.console import Console
+from rich.table import Table
+from rich.progress import Progress
+from typing import Optional
 
-
+console = Console()
 
 
 
@@ -12,3 +17,11 @@ def print_terminal(char_to_print):
     print(dashes, end='', flush=True)
 
 
+def show_header():
+
+    console.clear()
+
+    typer.secho(f'''Welcome to Library CLI!
+    v0.1''', fg=typer.colors.CYAN)
+
+    print ('')

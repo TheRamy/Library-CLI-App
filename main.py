@@ -13,7 +13,18 @@ import util.session
 console = Console()
 app = typer.Typer()
 session = util.session.load()
+util.formating.show_header()
 
+
+@app.command()
+def command():
+    typer.echo("This is my command")
+
+@app.callback(help="Welcome to Library CLI.")
+def main():
+    """
+    My app description goes here
+    """
 
 
 @app.command("start")
@@ -23,12 +34,15 @@ def start():
 
     typer.secho(f'''Welcome to Library CLI v0.1!\n\n
         You can execute command '--help' to see the possible commands''', fg=typer.colors.GREEN)
+    print ('')
 
     if session:
         typer.secho(
-            f"Welcome back, {session['username']}!", fg=typer.colors.GREEN)
+            f"Welcome back, {session['username']}!", fg=typer.colors.BRIGHT_YELLOW)
+        print ('')
     else:
-        typer.secho(f"You are not logged in!", fg=typer.colors.WHITE)
+        typer.secho(f"You are not logged in!", fg=typer.colors.BRIGHT_YELLOW)
+        print ('')
 
     # TODO: connect to database
 
@@ -38,7 +52,7 @@ def start():
 
 @app.command("sign_up")
 def sign_up(username: str):
-    
+
     util.formating.show_header()
 
     typer.echo(f"Nice that you are signing up!")

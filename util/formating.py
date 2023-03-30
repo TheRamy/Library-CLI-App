@@ -43,7 +43,7 @@ def show_header():
 ██      ██ ██████  ██████  ███████ ██████    ████       ██      ██      ██ 
 ██      ██ ██   ██ ██   ██ ██   ██ ██   ██    ██        ██      ██      ██ 
 ███████ ██ ██████  ██   ██ ██   ██ ██   ██    ██         ██████ ███████ ██ 
-    ''', fg=typer.colors.GREEN)
+    ''', fg=typer.colors.BRIGHT_GREEN)
 
     # print('')
     # print_terminal("_")

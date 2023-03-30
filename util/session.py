@@ -1,10 +1,12 @@
 
 import base64
+import configparser
 import time
 import uuid
 import json
 
-SESSION_FILE = 'cookie.json'
+SESSION_FILE = 'cookie.json'  # The cookie file
+TIMEOUT_MINUTES = 5  # Minutes before the session will expire
 
 
 def load():
@@ -14,8 +16,8 @@ def load():
         with open(SESSION_FILE, 'r') as f:
             session = json.load(f)
         timestamp = session.get('timestamp', 0)
-        timeout_minutes = 5
-        if time.time() - timestamp < timeout_minutes * 60:
+
+        if time.time() - timestamp < TIMEOUT_MINUTES * 60:
 
             # here i am decoding the username string with base64 ~ramy
             txt2 = session['username']

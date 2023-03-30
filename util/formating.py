@@ -36,14 +36,13 @@ def show_header():
 
     # generated with font ANSI Regular from here:
     # https://patorjk.com/software/taag/#p=display&h=0&v=0&f=ANSI%20Regular&t=Library%20CLI
+
     typer.secho(f'''
 ██      ██ ██████  ██████   █████  ██████  ██    ██      ██████ ██      ██ 
 ██      ██ ██   ██ ██   ██ ██   ██ ██   ██  ██  ██      ██      ██      ██ 
 ██      ██ ██████  ██████  ███████ ██████    ████       ██      ██      ██ 
 ██      ██ ██   ██ ██   ██ ██   ██ ██   ██    ██        ██      ██      ██ 
 ███████ ██ ██████  ██   ██ ██   ██ ██   ██    ██         ██████ ███████ ██ 
-                                                                           
-                                                                                            
     ''', fg=typer.colors.GREEN)
 
     # print('')

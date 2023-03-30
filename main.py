@@ -15,6 +15,7 @@ app = typer.Typer()
 session = util.session.load()
 
 
+
 @app.command("start")
 def start():
 
@@ -37,9 +38,11 @@ def start():
 
 @app.command("sign_up")
 def sign_up(username: str):
-    console.clear()
+    
+    util.formating.show_header()
 
     typer.echo(f"Nice that you are signing up!")
+    typer.echo(f"")
     util.cli.cli_add_user(username)
 
 

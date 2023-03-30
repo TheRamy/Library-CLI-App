@@ -20,7 +20,7 @@ def cli_add_user(username):
         typer.secho(f'Username {username} is NOT available!', fg='red')
     else:
 
-        typer.secho(f'YAY! Username {username} is available!', fg='green')
+        typer.secho(f"Username '{username}' is available!", fg='green')
         pwd = console.input('Enter your password: ', password=True)
         pwd2 = console.input('Enter your password (again): ', password=True)
 

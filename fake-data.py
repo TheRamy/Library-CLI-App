@@ -35,7 +35,7 @@ def truncate_all_tables_data():
 
 how_many_users = 1
 how_many_books = 1
-how_many_logs = 5 #how_many_books * 2
+how_many_logs = 5  # how_many_books * 2
 
 # insert data into users table
 for i in range(how_many_users):
@@ -71,8 +71,9 @@ book_ids = [r[0] for r in cur.fetchall()]
 
 
 for i in range(how_many_logs):
-    user_id = fake.random_element(elements=user_ids) # choose from the fetched user_id list above!
-    book_id = fake.random_element(elements=book_ids) # same for book_id list
+    # choose from the fetched user_id list above!
+    user_id = fake.random_element(elements=user_ids)
+    book_id = fake.random_element(elements=book_ids)  # same for book_id list
 
     borrowed = fake.boolean()
     read = fake.boolean()

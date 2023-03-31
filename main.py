@@ -102,21 +102,22 @@ def search_by_name(name: str):
 
     util.formating.show_header()
 
-
-    search_result = util.db.sql_select(f"SELECT * from books WHERE lower(book_name) LIKE lower('%{name}%')", "fetchall")
+    search_result = util.db.sql_select(
+        f"SELECT * from books WHERE lower(book_name) LIKE lower('%{name}%')", "fetchall")
 
     if search_result:
 
-        typer.secho(f'You searched for a book with the name "{name}" so here is the result:', fg='white')
-    
-        table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre', 'Availability' ]
+        typer.secho(
+            f'You searched for a book with the name "{name}" so here is the result:', fg='white')
+
+        table_headers = ['#', 'Book ID', 'Name',
+                         'Author', '# Pages', 'Genre', 'Availability']
         util.formating.print_table(table_headers, search_result)
         console.print('')
     else:
-        typer.secho(f'No book  with the name "{name}" could be found. Try again!', fg='white')
+        typer.secho(
+            f'No book  with the name "{name}" could be found. Try again!', fg='white')
         console.print('')
-
-
 
 
 @app.command("search_by_author")
@@ -124,24 +125,26 @@ def search_by_author(author: str):
 
     util.formating.show_header()
 
-
-    search_result = util.db.sql_select(f"SELECT * from books WHERE lower(book_author) LIKE lower('%{author}%')", "fetchall")
+    search_result = util.db.sql_select(
+        f"SELECT * from books WHERE lower(book_author) LIKE lower('%{author}%')", "fetchall")
 
     if search_result:
 
-        typer.secho(f'You searched for books by author with the name "{author}" so here is the result:', fg='white')
-    
-        table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre', 'Availability' ]
+        typer.secho(
+            f'You searched for books by author with the name "{author}" so here is the result:', fg='white')
+
+        table_headers = ['#', 'Book ID', 'Name',
+                         'Author', '# Pages', 'Genre', 'Availability']
         util.formating.print_table(table_headers, search_result)
         console.print('')
     else:
-        typer.secho(f'No book  with the name "{author}" could be found. Try again!', fg='white')
+        typer.secho(
+            f'No book  with the name "{author}" could be found. Try again!', fg='white')
         console.print('')
 
 
-
 @app.command("recently_added")
-def recently_added (genre: Optional[str] = typer.Argument(None)):
+def recently_added(genre: Optional[str] = typer.Argument(None)):
 
     util.formating.show_header()
 
@@ -156,15 +159,16 @@ def recently_added (genre: Optional[str] = typer.Argument(None)):
         WHERE logs.added IS TRUE and lower(books.book_genre) = lower('{genre}')
         ORDER BY logs.timestamp DESC
         LIMIT 5;
-            """ , "fetchall")
+            """, "fetchall")
 
-        
-        typer.secho(f'Here are the 5 most recently added books in the genre"{genre}": ', fg='white')
+        typer.secho(
+            f'Here are the 5 most recently added books in the genre"{genre}": ', fg='white')
 
-        table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre', '', 'Availability', 'Added by']
-        util.formating.print_table(table_headers, search_result, [6]) #removes colum number 6
+        table_headers = ['#', 'Book ID', 'Name', 'Author',
+                         '# Pages', 'Genre', '', 'Availability', 'Added by']
+        util.formating.print_table(table_headers, search_result, [
+                                   6])  # removes colum number 6
         typer.secho('')
-
 
     else:
         search_result = util.db.sql_select(f"""
@@ -176,29 +180,14 @@ def recently_added (genre: Optional[str] = typer.Argument(None)):
             WHERE logs.added IS TRUE
             ORDER BY logs.timestamp DESC
             LIMIT 5;
-        """ , "fetchall")
+        """, "fetchall")
 
         typer.secho(f'Here are the 5 most recently added books:', fg='white')
-        table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre', '', 'Availability', 'Added by']
-        util.formating.print_table(table_headers, search_result, [6]) #removes colum number 6
+        table_headers = ['#', 'Book ID', 'Name', 'Author',
+                         '# Pages', 'Genre', '', 'Availability', 'Added by']
+        util.formating.print_table(table_headers, search_result, [
+                                   6])  # removes colum number 6
         typer.secho(f'')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # @app.command("display_table")

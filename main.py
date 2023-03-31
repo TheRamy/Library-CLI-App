@@ -119,6 +119,34 @@ def search_by_name(name: str):
 
 
 
+@app.command("search_by_author")
+def search_by_author(author: str):
+
+    util.formating.show_header()
+
+
+    search_result = util.db.sql_select(f"SELECT * from books WHERE lower(book_author) LIKE lower('%{author}%')", "fetchall")
+
+    if search_result:
+
+        typer.secho(f'You searched for books by author with the name "{author}" so here is the result:', fg='white')
+    
+        table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre', 'Availability' ]
+        util.formating.print_table(table_headers, search_result)
+        console.print('')
+    else:
+        typer.secho(f'No book  with the name "{author}" could be found. Try again!', fg='white')
+        console.print('')
+
+
+
+
+
+
+
+
+
+
 
 
 # @app.command("display_table")

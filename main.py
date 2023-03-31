@@ -202,24 +202,19 @@ def most_read_books(genre: Optional[str] = typer.Argument(None)):
     if genre:
 
         search_result = util.db.sql_select(f"""
-        SELECT DISTINCT  logs.book_id, books.book_name, books.book_author, books.book_number_of_pages,books.book_genre, books.book_count, logs.timestamp, users.user_name
+            SELECT books.book_id, books.book_name, books.book_author, books.book_genre, COUNT(DISTINCT logs.user_id) as read_count
+            FROM books
+            JOIN logs ON books.book_id = logs.book_id
+            WHERE logs.added = TRUE and lower(books.book_genre) = lower('{genre}')
+            GROUP BY books.book_id
+            ORDER BY read_count DESC
+            LIMIT 10;
+        """, "fetchall")
 
-        FROM logs
-        JOIN books ON logs.book_id = books.book_id
-        JOIN users on logs.user_id = users.user_id
-        WHERE logs.added IS TRUE and lower(books.book_genre) = lower('{genre}')
-        ORDER BY logs.timestamp DESC
-        LIMIT 5;
-            """, "fetchall")
-
-        typer.secho(
-            f'Here are the 5 most recently added books in the genre "{genre}": ', fg='white')
-
-        table_headers = ['#', 'Book ID', 'Name', 'Author',
-                         '# Pages', 'Genre', '', 'Availability', 'Added by']
-        util.formating.print_table(table_headers, search_result, [
-                                   6])  # removes colum number 6
-        typer.secho('')
+        typer.secho(f'Here are the 10 most read books in the genre {genre}:', fg='white')
+        table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
+        util.formating.print_table(table_headers, search_result)
+        typer.secho(f'')
 
     else:
         search_result = util.db.sql_select(f"""

@@ -238,6 +238,57 @@ def most_read_books(genre: Optional[str] = typer.Argument(None)):
 
 
 
+@app.command("most_favorite_books")
+def most_favorite_books(genre: Optional[str] = typer.Argument(None)):
+
+    util.formating.show_header()
+
+    if genre:
+
+        search_result = util.db.sql_select(f"""
+            SELECT books.book_id, books.book_name, books.book_author, books.book_genre, COUNT(DISTINCT logs.user_id) as read_count
+            FROM books
+            JOIN logs ON books.book_id = logs.book_id
+            WHERE logs.favorited = TRUE and lower(books.book_genre) = lower('{genre}')
+            GROUP BY books.book_id
+            ORDER BY read_count DESC
+            LIMIT 10;
+        """, "fetchall")
+
+        typer.secho(f'Here are the 10 most favorited books in the genre {genre}:', fg='white')
+        table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
+        util.formating.print_table(table_headers, search_result)
+        typer.secho(f'')
+
+    else:
+        search_result = util.db.sql_select(f"""
+            SELECT books.book_id, books.book_name, books.book_author, books.book_genre, COUNT(DISTINCT logs.user_id) as read_count
+            FROM books
+            JOIN logs ON books.book_id = logs.book_id
+            WHERE logs.favorited = TRUE
+            GROUP BY books.book_id
+            ORDER BY read_count DESC
+            LIMIT 10;
+        """, "fetchall")
+
+        typer.secho(f'Here are the 10 most favorited books:', fg='white')
+        table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
+        util.formating.print_table(table_headers, search_result)
+        typer.secho(f'')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # @app.command("display_table")

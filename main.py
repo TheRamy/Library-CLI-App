@@ -162,7 +162,7 @@ def recently_added(genre: Optional[str] = typer.Argument(None)):
             """, "fetchall")
 
         typer.secho(
-            f'Here are the 5 most recently added books in the genre"{genre}": ', fg='white')
+            f'Here are the 5 most recently added books in the genre "{genre}": ', fg='white')
 
         table_headers = ['#', 'Book ID', 'Name', 'Author',
                          '# Pages', 'Genre', '', 'Availability', 'Added by']

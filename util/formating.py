@@ -16,6 +16,7 @@ def print_terminal(char_to_print):
     print(dashes, end='', flush=True)
 
 
+
 def show_header():
     """To show the same header on each command. ~ramy"""
 
@@ -36,21 +37,50 @@ def show_header():
     # print_terminal("_")
 
 
-def print_table(headers, table_db):
-    """Provide a list with header names you want and 
-    the result of the sql query result (fetchall) and 
-    it will return the table. ~ramy
-      """
-    
+
+
+
+
+
+
+
+
+def print_table(headers, table_db, columns_to_be_removed=None):
+    """
+    Provide a list with header names you want and the result of the sql query result (fetchall) and it will return the table.
+    :param headers: list of header names
+    :param table_db: sql query result (fetchall)
+    :param columns_to_be_removed: list of column numbers to be removed (0-indexed)
+    """
     table = Table(show_header=True, header_style="bold green")
-    for header in headers:
-        table.add_column(header, style="dim", min_width=None, justify=True)
+    for i, header in enumerate(headers):
+        if columns_to_be_removed is None or i not in columns_to_be_removed:
+            table.add_column(header, style="dim", min_width=None, justify=True)
 
     i = 1
     for row in table_db:
-        row_data = [str(col) for col in row]
+        row_data = [str(col) for j, col in enumerate(row) if columns_to_be_removed is None or j not in columns_to_be_removed]
         table.add_row(str(i), *row_data)
         i += 1
 
     console.print(table)
+
+
+# def print_table(headers, table_db):
+#     """Provide a list with header names you want and 
+#     the result of the sql query result (fetchall) and 
+#     it will return the table. ~ramy
+#       """
+    
+#     table = Table(show_header=True, header_style="bold green")
+#     for header in headers:
+#         table.add_column(header, style="dim", min_width=None, justify=True)
+
+#     i = 1
+#     for row in table_db:
+#         row_data = [str(col) for col in row]
+#         table.add_row(str(i), *row_data)
+#         i += 1
+
+#     console.print(table)
 

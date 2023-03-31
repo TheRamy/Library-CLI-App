@@ -234,7 +234,7 @@ def most_read_books(genre: Optional[str] = typer.Argument(None)):
 
         typer.secho(f'Here are the 10 most read books:', fg='white')
         table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
-        util.formating.print_table(table_headers, search_result)  # removes colum number 6
+        util.formating.print_table(table_headers, search_result)
         typer.secho(f'')
 
 

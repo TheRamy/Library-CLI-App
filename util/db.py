@@ -3,7 +3,6 @@ from rich.table import Table
 
 import psycopg2
 
-
 def db_config(filename='db.ini', section='database'):
     # create a parser
     parser = ConfigParser()

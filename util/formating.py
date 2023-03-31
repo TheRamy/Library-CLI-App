@@ -21,19 +21,6 @@ def show_header():
 
     console.clear()
 
-    # Generated using font "big" using:
-    #  https://patorjk.com/software/taag/#p=display&h=0&v=2&f=Big&t=Library%20CLI
-#     typer.secho(f'''
-#   _        _   _                                        _____   _        _____
-#  | |      (_) | |                                      / ____| | |      |_   _|
-#  | |       _  | |__    _ __    __ _   _ __   _   _    | |      | |        | |
-#  | |      | | | '_ \  | '__|  / _` | | '__| | | | |   | |      | |        | |
-#  | |____  | | | |_) | | |    | (_| | | |    | |_| |   | |____  | |____   _| |_
-#  |______| |_| |_.__/  |_|     \__,_| |_|     \__, |    \_____| |______| |_____|
-#                                               __/ |
-#                                              |___/
-#     ''', fg=typer.colors.BRIGHT_WHITE)
-
     # generated with font ANSI Regular from here:
     # https://patorjk.com/software/taag/#p=display&h=0&v=0&f=ANSI%20Regular&t=Library%20CLI
 
@@ -43,7 +30,7 @@ def show_header():
 ██      ██ ██████  ██████  ███████ ██████    ████       ██      ██      ██ 
 ██      ██ ██   ██ ██   ██ ██   ██ ██   ██    ██        ██      ██      ██ 
 ███████ ██ ██████  ██   ██ ██   ██ ██   ██    ██         ██████ ███████ ██ 
-    ''', fg=typer.colors.BRIGHT_GREEN)
+    ''', fg=typer.colors.GREEN)
 
     # print('')
     # print_terminal("_")

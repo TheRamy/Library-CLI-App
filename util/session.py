@@ -5,7 +5,7 @@ import uuid
 import json
 
 SESSION_FILE = 'cookie.json'  # The cookie file
-TIMEOUT_MINUTES = 5  # Minutes before the session will expire
+TIMEOUT_MINUTES = 60  # Minutes before the session will expire
 
 
 def load():

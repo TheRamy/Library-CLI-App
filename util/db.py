@@ -92,15 +92,3 @@ def sql_insert(sql):
             cur.close()
             conn.close()
             # print("PostgreSQL connection is closed")
-
-
-def example_sql():
-    """Just an example by Ramy."""
-
-    return sql_select("SELECT * FROM test", 'fetchone')
-
-
-def example_table():
-    """Just an example by Ramy."""
-
-    return sql_select("SELECT * FROM cool_table", 'fetchall')

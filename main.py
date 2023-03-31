@@ -102,17 +102,20 @@ def search_by_name(name: str):
 
     util.formating.show_header()
 
-    # Turning the book name to lower case
-    # also, the sql query returns results in lower case. ~ramy
-    name = name.lower()
-    table_db = util.db.sql_select(f"SELECT * from books WHERE lower(book_name) LIKE '%{name}%'", "fetchall")
 
-    typer.secho(f'You searched for a book with the name "{name}" so here is the result:', fg='white')
+    search_result = util.db.sql_select(f"SELECT * from books WHERE lower(book_name) LIKE lower('%{name}%')", "fetchall")
+
+    if search_result:
+
+        typer.secho(f'You searched for a book with the name "{name}" so here is the result:', fg='white')
     
-    headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre', 'Availability' ]
-    util.formating.print_table(headers,table_db)
+        table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre', 'Availability' ]
+        util.formating.print_table(table_headers, search_result)
+        console.print('')
+    else:
+        typer.secho(f'No book  with the name "{name}" could be found. Try again!', fg='white')
+        console.print('')
 
-    console.print('')
 
 
 

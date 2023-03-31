@@ -34,3 +34,23 @@ def show_header():
 
     # print('')
     # print_terminal("_")
+
+
+def print_table(headers, table_db):
+    """Provide a list with header names you want and 
+    the result of the sql query result (fetchall) and 
+    it will return the table. ~ramy
+      """
+    
+    table = Table(show_header=True, header_style="bold green")
+    for header in headers:
+        table.add_column(header, style="dim", min_width=None, justify=True)
+
+    i = 1
+    for row in table_db:
+        row_data = [str(col) for col in row]
+        table.add_row(str(i), *row_data)
+        i += 1
+
+    console.print(table)
+

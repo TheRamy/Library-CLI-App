@@ -102,35 +102,20 @@ def search_by_name(name: str):
 
     util.formating.show_header()
 
-    table = Table(show_header=True, header_style="bold green")
-    # table.add_column("Column 1", style="dim", width=10)
-    table.add_column("#", style="dim", min_width=None, justify=True)
-    table.add_column("Book ID", style="dim", min_width=None, justify=True)
-    table.add_column("Name", style="dim", min_width=None, justify=True)
-    table.add_column("Author", style="dim", min_width=None, justify=True)
-    table.add_column("# Pages", style="dim", min_width=None, justify=True)
-    table.add_column("Genre", style="dim", min_width=None, justify=True)
-    table.add_column("Availability", style="dim", min_width=None, justify=True)
-
-    # util.db.example_table()
-
     # Turning the book name to lower case
     # also, the sql query returns results in lower case. ~ramy
     name = name.lower()
-    # table_db = util.db.sql_select(f"SELECT * from books WHERE lower(book_name) = '{name}'", "fetchall")
-    table_db = util.db.sql_select(
-        f"SELECT * from books WHERE lower(book_name) LIKE '%{name}%'", "fetchall")
+    table_db = util.db.sql_select(f"SELECT * from books WHERE lower(book_name) LIKE '%{name}%'", "fetchall")
 
-    i = 1
-    for row in table_db:
-        table.add_row(str(i), str(row[0]), str(row[1]), str(
-            row[2]), str(row[3]), str(row[4]), str(row[5]))
-        i += 1
+    typer.secho(f'You searched for a book with the name "{name}" so here is the result:', fg='white')
+    
+    headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre', 'Availability' ]
+    util.formating.print_table(headers,table_db)
 
-    typer.secho(
-        f'You searched for a book named "{name}" so here is the result:', fg='white')
-    console.print(table)
     console.print('')
+
+
+
 
 
 # @app.command("display_table")

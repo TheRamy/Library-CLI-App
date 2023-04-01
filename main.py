@@ -476,7 +476,11 @@ def mark_read(book_id: int):
             #     set borrowed=false
             #     WHERE user_id ={user_id} and book_id={book_id}
             # """)
-            typer.secho(f"Book id {book_id} is already marked as read!", fg='green')
+
+            book_name = util.db.sql_select(f"SELECT book_name from books WHERE book_id = {book_id}")
+            book_name = book_name[0][0]
+
+            typer.secho(f"Book id {book_id} ({book_name}) is already marked as read!", fg='green')
             typer.secho(f"")
 
         else:
@@ -490,7 +494,11 @@ def mark_read(book_id: int):
                     INSERT INTO logs (user_id, book_id, read)
                     VALUES ('{user_id}', '{book_id}', True)
                 """)
-                typer.secho(f"Marked book id {book_id} as read!", fg='green')
+
+                book_name = util.db.sql_select(f"SELECT book_name from books WHERE book_id = {book_id}")
+                book_name = book_name[0][0]
+
+                typer.secho(f"Marked book id {book_id} ({book_name}) as read!", fg='green')
                 typer.secho(f"")
             else:
                 typer.secho(f"Book with id {book_id} could not be found", fg='red')

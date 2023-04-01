@@ -367,24 +367,67 @@ def add_book():
 
 
 @app.command("borrow_book")
-def borrow_book(book_id, user_name):
+def borrow_book(book_id: int, user_name: str):
+
     if session:
         typer.secho(
             f"Hello, {session['username']}! you are logged in",  fg='green')
-        query = f""" update logs
-        SET logs.borrowed boolean =  CASE 
-            WHEN logs.book_id = {book_id} AND {session['username']} = {user_name} THEN TRUE
-        
-        SET books.book_count =  CASE 
-            WHEN logs.book_id = {book_id} AND {session['username']} = {user_name} THEN book.book_count-1
-        
-        FROM logs INNER JOIN books ON logs.book_id = books.book_id
-        
-        """
-        typer.secho(
-            f"Thanks, {session['username']}! you have borrowed book {book_id}",  fg='green')
+        borrowed = util.db.sql_select(
+            f"""SELECT logs.user_id FROM logs WHERE logs.borrowed = TRUE AND logs.book_id = {book_id}""")
+        if not borrowed:
+
+            query_1 = f"""
+            UPDATE logs
+            SET borrowed = TRUE
+
+            FROM logs INNER JOIN users ON logs.user_id=users.user_id INNER JOIN books ON books.book_id=logs.book_id
+
+            WHERE users.user_name = {user_name} AND  books.book_id = {book_id}
+
+            """
+
+            query_2 = f"""
+            
+            UPDATE books
+            SET books.book_count =  CASE
+                WHEN books.book_id = {book_id} AND users.user_name = {user_name} THEN books.book_count-1
+                ELSE books.book_count
+                END
+            FROM books INNER JOIN logs ON books.book_id=logs.book_id INNER JOIN users ON logs.user_id = users.user_id;
+            """
+
+            util.db.sql_insert(query_2)
+            util.db.sql_insert(query_1)
+
+            query_3 = """
+            
+            SELECT book_id book_count from books
+            WHERE book_id != 0 
+            ORDER BY book_id DESC
+            """
+            search_result = util.db.sql_select(query_3)
+            typer.secho(
+                f"Thanks, {session['username']}! you have borrowed book {book_id}",  fg='green')
+
+            table_headers = ['#', 'book_id', 'book_count']
+            util.formating.print_table(table_headers, search_result)
+            typer.secho(f'')
+        else:
+            typer.secho(f' sorry Book {book_id} is not available')
+
     else:
         typer.secho("You need to login first.",  fg='red')
+
+
+@app.command("fav_book")
+def fav_book(book_id, user_name):
+    if session:
+        typer.secho(
+            f"Hello, {session['username']}! you are logged in",  fg='green')
+        query = f""" update users
+        CASE 
+            WHEN logs.book_id = {book_id} AND {session['username']} = {user_name} THEN 
+            """
 
         #######################################################
 #######################################################

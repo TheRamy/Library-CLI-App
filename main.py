@@ -380,7 +380,7 @@ def add_book():
             typer.echo(len(search_result))
             util.db.sql_update(f"""
                 UPDATE books 
-                SET book_count = book_count
+                SET book_count = {book_count}
                 WHERE ((lower(book_name) = lower('%{name}%') AND lower(book_author) = lower('%{author}%'))) 
             """)
         else:

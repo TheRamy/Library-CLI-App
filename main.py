@@ -356,74 +356,50 @@ def most_read_authors():
 #######################################################
 @app.command("add_book")
 def add_book():
-
     util.formating.show_header()
-
     if session:
-
         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
         typer.echo("Please enter required book info to add!")
-        
-        name = "Suc ve Ceza" #typer.prompt("Name")
-        author = "Dostoyevski" #typer.prompt("Author")
-        page_count = 345 #typer.prompt("# Pages")
-        genre = "Drama" #typer.prompt("Genre") 
+        name = typer.prompt("Name")
+        author = typer.prompt("Author")
+        page_count = typer.prompt("# Pages")
+        genre = typer.prompt("Genre")
         book_count = 1
-        
-        sql = f"""
-            SELECT * from books 
-            WHERE ((lower(book_name) = lower('{name}') AND lower(book_author) = lower('{author}'))) 
-        """
-        search_result = util.db.sql_select(sql, "fetchall")
-
-        print(f"sql is: {sql}")
-        print(f"search_result is: {search_result}")
-
+        search_result = util.db.sql_select(f"""
+            SELECT * from books
+            WHERE (lower(book_name) = lower('{name}') AND lower(book_author) = lower('{author}'))
+        """, "fetchall")
         if search_result:       # if there is same book in database then update only book_count
             book_count = search_result[0][5] + 1
-            book_id = search_result[0][0]
-
-            print(f"book_count is: {book_count}")
-
-            print(f"book_id is: {book_id}")
-
-
+            print(book_count)
             util.db.sql_update(f"""
-                UPDATE books 
+                UPDATE books
                 SET book_count = {book_count}
-                WHERE book_id = {book_id}
-                            """)
-        else:
-            util.db.sql_insert(f"""
-                INSERT INTO books (book_name, book_author, book_number_of_pages, book_genre, book_count) 
-                VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count}) 
+                WHERE (lower(book_name) = lower('{name}') AND lower(book_author) = lower('{author}'))
             """)
-        
+        else:
+            print('else')
+            util.db.sql_insert(f"""
+                INSERT INTO books (book_name, book_author, book_number_of_pages, book_genre, book_count)
+                VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count})
+            """)
         """"log the process"""
-        
-        # # getting book_id
-        # search_result = util.db.sql_select(f"""
-        #     SELECT book_id from books 
-        #     WHERE ((lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%'))) 
-        # """, "fetchall")    
-        # book_id = search_result[0][0]
-        # print(f"book_id is: {book_id}")
-        
-        # # getting the user id:
-        # user_id = util.db.sql_select(
-        #     f"SELECT user_id from users WHERE user_name = '{session['username']}'")
-        # user_id = user_id[0][0]
-        # print(f"user_id is: {user_id}")
-
-        
-        # util.db.sql_insert(f"""
-        #     INSERT INTO logs (book_name, book_author, book_number_of_pages, book_genre, book_count) 
-        #     VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count}) 
-        # """)            
-        
-            
+        # getting book_id
+        search_result = util.db.sql_select(f"""
+            SELECT book_id from books
+            WHERE (lower(book_name) = lower('{name}') AND lower(book_author) = lower('{author}'))
+        """, "fetchall")
+        book_id = search_result[0][0]
+        # getting the user id:
+        user_id = util.db.sql_select(
+            f"SELECT user_id from users WHERE user_name = '{session['username']}'")
+        user_id = user_id[0][0]
+        # adding log record
+        util.db.sql_insert(f"""
+            INSERT INTO logs (user_id, book_id, added)
+            VALUES ('{user_id}', '{book_id}', True)
+        """)
         typer.echo("Book is successfully added!")
-
     else:
         typer.secho("You need to login first.",  fg='red')
 

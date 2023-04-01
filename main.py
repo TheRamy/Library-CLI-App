@@ -375,9 +375,8 @@ def add_book():
             WHERE ((lower('book_name') LIKE lower('%{name}%') AND lower('book_author') LIKE lower('%{author}%'))) 
         """, "fetchall")
         
-        if search_result:
+        if search_result:       # if there is same book in database then update only book_count
             book_count = search_result[0][5] + 1
-            typer.echo(len(search_result))
             util.db.sql_update(f"""
                 UPDATE books 
                 SET book_count = {book_count}
@@ -388,38 +387,32 @@ def add_book():
                 INSERT INTO books (book_name, book_author, book_number_of_pages, book_genre, book_count) 
                 VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count}) 
             """)
-
-            #TODO for Kursad: also add an entry into the log tabe!
+        
+        """"log the process"""
+        
+        # getting book_id
+        search_result = util.db.sql_select(f"""
+            SELECT book_id from books 
+            WHERE ((lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%'))) 
+        """, "fetchall")    
+        book_id = search_result[0][0]
+        
+        # getting the user id:
+        user_id = util.db.sql_select(
+            f"SELECT user_id from users WHERE user_name = '{session['username']}'")
+        user_id = user_id[0][0]
+        
+        util.db.sql_insert(f"""
+            INSERT INTO logs (book_name, book_author, book_number_of_pages, book_genre, book_count) 
+            VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count}) 
+        """)            
+        
             
         typer.echo("Book is successfully added!")
 
     else:
         typer.secho("You need to login first.",  fg='red')
 
-
-@app.command("borrow_book")
-def borrow_book(book_id, user_name):
-    if session:
-        typer.secho(
-            f"Hello, {session['username']}! you are logged in",  fg='green')
-        query = f""" update logs
-        SET logs.borrowed boolean =  CASE 
-            WHEN logs.book_id = {book_id} AND {session['username']} = {user_name} THEN TRUE
-        
-        SET books.book_count =  CASE 
-            WHEN logs.book_id = {book_id} AND {session['username']} = {user_name} THEN book.book_count-1
-        
-        FROM logs INNER JOIN books ON logs.book_id = books.book_id
-        
-        """
-        util.db.sql_update(query)
-
-        typer.secho(
-            f"Thanks, {session['username']}! you have borrowed book {book_id}",  fg='green')
-    else:
-        typer.secho("You need to login first.",  fg='red')
-
-        #######################################################
 
 @app.command("return_book")
 def return_book(book_id: int):

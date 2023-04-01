@@ -36,7 +36,7 @@ def show_header():
     # print_terminal("_")
 
 
-def print_table(headers, table_db, columns_to_be_removed=None):
+def print_table(headers, table_db, columns_to_be_removed=None, show_count=True):
     """
     Provide a list with header names you want and the result 
     of the sql query result (fetchall) and it will print the 
@@ -44,9 +44,13 @@ def print_table(headers, table_db, columns_to_be_removed=None):
 
     :param headers: list of header names
     :param table_db: sql query result (fetchall)
-    :param columns_to_be_removed: list of column numbers to be removed (0-indexed) 
+    :param columns_to_be_removed: list of column numbers to be removed (0-indexed)
+    :param show_count: whether to display the counting (the i) in the first column
     """
     table = Table(show_header=True, header_style="bold green")
+
+    if show_count:
+        table.add_column("#", style="dim", min_width=None, justify=True)
 
     for i, header in enumerate(headers):
         if columns_to_be_removed is None or i not in columns_to_be_removed:
@@ -56,7 +60,11 @@ def print_table(headers, table_db, columns_to_be_removed=None):
     for row in table_db:
         row_data = [str(col) for j, col in enumerate(
             row) if columns_to_be_removed is None or j not in columns_to_be_removed]
-        table.add_row(str(i), *row_data)
-        i += 1
+        if show_count:
+            table.add_row(str(i), *row_data)
+            i += 1
+        else:
+            table.add_row(*row_data)
 
+    console = Console()
     console.print(table)

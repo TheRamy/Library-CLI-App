@@ -512,6 +512,8 @@ def my_books():
     util.formating.show_header()
     if session:
         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
+        typer.secho(f"")
+
         
         # getting the user id:
         user_id = util.db.sql_select(

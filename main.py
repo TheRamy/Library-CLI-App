@@ -476,8 +476,23 @@ def mark_read(book_id: int):
             typer.secho(f"")
 
         else:
-            typer.secho(f"Marked book id {book_id} as read!", fg='red')
-            typer.secho(f"")
+
+            book_exist = util.db.sql_select(f"SELECT * from books WHERE book_id = '{book_id}'")
+            
+            if book_exist :
+
+                # adding log record
+                util.db.sql_insert(f"""
+                    INSERT INTO logs (user_id, book_id, read)
+                    VALUES ('{user_id}', '{book_id}', True)
+                """)
+                typer.secho(f"Marked book id {book_id} as read!", fg='green')
+                typer.secho(f"")
+            else:
+                typer.secho(f"Book with id {book_id} could not be found", fg='red')
+                typer.secho(f"")
+
+
 
     else:
         typer.secho("You need to login first.",  fg='red')

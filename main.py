@@ -110,7 +110,8 @@ def start():
         add_book()
     elif answer['run_command'] == "borrow_book":
 
-        # borrow_book()
+        book_id = typer.prompt("What's the book id of the book you're returning?")
+        borrow_book(book_id)
         pass
     elif answer['run_command'] == "return_book":
 
@@ -620,10 +621,15 @@ def statistics():
 
 
 @app.command("borrow_book")
-def borrow_book(book_id: int, user_name: str):
+def borrow_book(book_id: int):
+    util.formating.show_header()
+
     if session:
         typer.secho(
             f"Hello, {session['username']}! you are logged in",  fg='green')
+        typer.secho('')
+        
+        user_name = session['username']
         borrowed = util.db.sql_select(
             f"""SELECT l.user_id FROM logs l WHERE l.borrowed = TRUE AND l.book_id = {book_id}""")
         if not borrowed:
@@ -641,19 +647,21 @@ def borrow_book(book_id: int, user_name: str):
             """
             util.db.sql_insert(query_1)
             util.db.sql_insert(query_2)
-            query_3 = f"""
-            SELECT book_id, borrowed FROM logs WHERE book_id = {book_id} ;
-            """
-            search_result = util.db.sql_select(query_3)
+            # query_3 = f"""
+            # SELECT book_id, borrowed FROM logs WHERE book_id = {book_id} ;
+            # """
+            # search_result = util.db.sql_select(query_3)
             typer.secho(
-                f"Thanks, {session['username']}! you have borrowed book {book_id}",  fg='green')
-            table_headers = ['#', 'book_id', 'status']
-            util.formating.print_table(table_headers, search_result)
+                f"Thanks, {session['username']} for borrowing book {book_id}",  fg='green')
+            # table_headers = ['#', 'book_id', 'status']
+            # util.formating.print_table(table_headers, search_result)
             typer.secho(f'')
         else:
-            typer.secho(f' sorry Book {book_id} is not available')
+            typer.secho(f'sorry book {book_id} is not available', fg='red')
+            typer.secho(f'')
     else:
         typer.secho("You need to login first.",  fg='red')
+        typer.secho(f'')
 
 
 @app.command("fav_book")

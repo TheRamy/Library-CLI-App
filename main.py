@@ -409,6 +409,8 @@ def borrow_book(book_id, user_name):
         FROM logs INNER JOIN books ON logs.book_id = books.book_id
         
         """
+        util.db.sql_update(query)
+        
         typer.secho(
             f"Thanks, {session['username']}! you have borrowed book {book_id}",  fg='green')
     else:

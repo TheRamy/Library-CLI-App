@@ -364,23 +364,24 @@ def add_book():
         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
         typer.echo("Please enter required book info to add!")
         
-        name = typer.prompt("Name: ")
-        author = typer.prompt("Author: ")
-        page_count = typer.prompt("Pages: ")
-        genre = typer.prompt("Genre: ")
+        name = typer.prompt("Name")
+        author = typer.prompt("Author")
+        page_count = typer.prompt("# Pages")
+        genre = typer.prompt("Genre")
         book_count = 1
         
         search_result = util.db.sql_select(f"""
             SELECT * from books 
-            WHERE (lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%')) 
+            WHERE ((lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%'))) 
         """, "fetchall")
         
         if search_result:
-            book_count = search_result["book_count"] + 1
-            util.db.sql_insert(f"""
+            book_count = search_result[0][5] + 1
+            typer.echo(len(search_result))
+            util.db.sql_update(f"""
                 UPDATE books 
-                SET book_count = count
-                WHERE (lower(book_name) = lower('%{name}%') AND lower(book_author) = lower('%{author}%')) 
+                SET book_count = book_count
+                WHERE ((lower(book_name) = lower('%{name}%') AND lower(book_author) = lower('%{author}%'))) 
             """)
         else:
             util.db.sql_insert(f"""

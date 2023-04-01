@@ -378,11 +378,10 @@ def add_book():
 
         print(f"sql is: {sql}")
         print(f"search_result is: {search_result}")
-        exit()
 
         if search_result:       # if there is same book in database then update only book_count
             book_count = search_result[0][5] + 1
-            book_id = search_result[0][0] + 1
+            book_id = search_result[0][0]
 
             print(f"book_count is: {book_count}")
 
@@ -402,19 +401,19 @@ def add_book():
         
         """"log the process"""
         
-        # getting book_id
-        search_result = util.db.sql_select(f"""
-            SELECT book_id from books 
-            WHERE ((lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%'))) 
-        """, "fetchall")    
-        book_id = search_result[0][0]
-        print(f"book_id is: {book_id}")
+        # # getting book_id
+        # search_result = util.db.sql_select(f"""
+        #     SELECT book_id from books 
+        #     WHERE ((lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%'))) 
+        # """, "fetchall")    
+        # book_id = search_result[0][0]
+        # print(f"book_id is: {book_id}")
         
-        # getting the user id:
-        user_id = util.db.sql_select(
-            f"SELECT user_id from users WHERE user_name = '{session['username']}'")
-        user_id = user_id[0][0]
-        print(f"user_id is: {user_id}")
+        # # getting the user id:
+        # user_id = util.db.sql_select(
+        #     f"SELECT user_id from users WHERE user_name = '{session['username']}'")
+        # user_id = user_id[0][0]
+        # print(f"user_id is: {user_id}")
 
         
         # util.db.sql_insert(f"""

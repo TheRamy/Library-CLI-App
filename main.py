@@ -105,6 +105,26 @@ def start():
     elif answer['run_command'] == "most_read_authors":
 
         most_read_authors()
+    elif answer['run_command'] == "add_book":
+
+        add_book()
+    elif answer['run_command'] == "borrow_book":
+
+        #borrow_book()
+        pass
+    elif answer['run_command'] == "return_book":
+
+        book_id = typer.prompt("What's the book id of the book you're returning?")
+        return_book(book_id)
+    elif answer['run_command'] == "mark_read":
+
+        book_id = typer.prompt("What's the book id that you want marked as read?")
+        mark_read(book_id)
+    elif answer['run_command'] == "mark_read":
+
+        book_id = typer.prompt("What's the book id that you want marked as read?")
+        mark_read(book_id)
+
 
     #################################################################
     #################################################################

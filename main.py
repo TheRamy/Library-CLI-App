@@ -622,18 +622,6 @@ def statistics():
 # ~~~~~~~~~~~~~~~ THE END ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #######################################################
 #######################################################
-@app.command("showme")
-def showme():
-    query_1 = f"""
-    SELECT *
-    FROM logs
-    """
-    selected = util.db.sql_select(query_1)
-    table_headers = ['#', 'Log_ID', 'User_ID', 'Book_ID',
-                     'Borrowed', 'READ', 'Favorited', 'Added', 'Timestamp']
-    # removes colum number 6
-    util.formating.print_table(table_headers, selected)
-    typer.secho(f'')
 
 
 if __name__ == "__main__":

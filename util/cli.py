@@ -29,7 +29,6 @@ def cli_add_user(username):
             sql = f"INSERT INTO users (user_name, user_password) VALUES('{username}', '{pwd2}')"
             add_user = util.db.sql_insert(sql)
             typer.secho(f'Signup complete! You may login!', fg='green')
-            return add_user
         else:
             typer.secho(f'password doesnt match. Try again.', fg='red')
 

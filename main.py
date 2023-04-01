@@ -372,12 +372,13 @@ def add_book():
         
         sql = f"""
             SELECT * from books 
-            WHERE ((lower('book_name') = lower('%{name}%') AND lower('book_author') = lower('%{author}%'))) 
+            WHERE ((lower(book_name) = lower('{name}') AND lower(book_author) = lower('{author}'))) 
         """
-        print(f"sql is: {sql}")
         search_result = util.db.sql_select(sql, "fetchall")
 
+        print(f"sql is: {sql}")
         print(f"search_result is: {search_result}")
+        exit()
 
         if search_result:       # if there is same book in database then update only book_count
             book_count = search_result[0][5] + 1

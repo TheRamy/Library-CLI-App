@@ -110,20 +110,22 @@ def start():
         add_book()
     elif answer['run_command'] == "borrow_book":
 
-        #borrow_book()
+        # borrow_book()
         pass
     elif answer['run_command'] == "return_book":
 
-        book_id = typer.prompt("What's the book id of the book you're returning?")
+        book_id = typer.prompt(
+            "What's the book id of the book you're returning?")
         return_book(book_id)
     elif answer['run_command'] == "mark_read":
 
-        book_id = typer.prompt("What's the book id that you want marked as read?")
+        book_id = typer.prompt(
+            "What's the book id that you want marked as read?")
         mark_read(book_id)
     elif answer['run_command'] == "fav_book":
 
-        #book_id = typer.prompt("What's the book id that you want marked as read?")
-        #fav_book(book_id)
+        # book_id = typer.prompt("What's the book id that you want marked as read?")
+        # fav_book(book_id)
         pass
     elif answer['run_command'] == "my_books":
 
@@ -131,11 +133,6 @@ def start():
     elif answer['run_command'] == "statistics":
 
         statistics()
-         
-
-
-
-
 
     #################################################################
     #################################################################
@@ -440,7 +437,6 @@ def add_book():
         typer.echo("")
 
 
-
 @app.command("return_book")
 def return_book(book_id: int):
 
@@ -478,7 +474,6 @@ def return_book(book_id: int):
         typer.secho(f"")
 
 
-
 @app.command("mark_read")
 def mark_read(book_id: int):
 
@@ -494,7 +489,8 @@ def mark_read(book_id: int):
             f"SELECT user_id from users WHERE user_name = '{session['username']}'")
         user_id = user_id[0][0]
 
-        already_marked_as_read = util.db.sql_select(f"SELECT * from logs WHERE user_id = {user_id} and read=TRUE and book_id = {book_id}")
+        already_marked_as_read = util.db.sql_select(
+            f"SELECT * from logs WHERE user_id = {user_id} and read=TRUE and book_id = {book_id}")
 
         if already_marked_as_read:
 
@@ -504,17 +500,20 @@ def mark_read(book_id: int):
             #     WHERE user_id ={user_id} and book_id={book_id}
             # """)
 
-            book_name = util.db.sql_select(f"SELECT book_name from books WHERE book_id = {book_id}")
+            book_name = util.db.sql_select(
+                f"SELECT book_name from books WHERE book_id = {book_id}")
             book_name = book_name[0][0]
 
-            typer.secho(f"Book id {book_id} ({book_name}) is already marked as read!", fg='green')
+            typer.secho(
+                f"Book id {book_id} ({book_name}) is already marked as read!", fg='green')
             typer.secho(f"")
 
         else:
 
-            book_exist = util.db.sql_select(f"SELECT * from books WHERE book_id = '{book_id}'")
-            
-            if book_exist :
+            book_exist = util.db.sql_select(
+                f"SELECT * from books WHERE book_id = '{book_id}'")
+
+            if book_exist:
 
                 # adding log record
                 util.db.sql_insert(f"""
@@ -522,20 +521,20 @@ def mark_read(book_id: int):
                     VALUES ('{user_id}', '{book_id}', True)
                 """)
 
-                book_name = util.db.sql_select(f"SELECT book_name from books WHERE book_id = {book_id}")
+                book_name = util.db.sql_select(
+                    f"SELECT book_name from books WHERE book_id = {book_id}")
                 book_name = book_name[0][0]
 
-                typer.secho(f"Marked book id {book_id} ({book_name}) as read!", fg='green')
+                typer.secho(
+                    f"Marked book id {book_id} ({book_name}) as read!", fg='green')
                 typer.secho(f"")
             else:
-                typer.secho(f"Book with id {book_id} could not be found", fg='red')
+                typer.secho(
+                    f"Book with id {book_id} could not be found", fg='red')
                 typer.secho(f"")
-
-
 
     else:
         typer.secho("You need to login first.",  fg='red')
-
 
 
 @app.command("my_books")
@@ -545,7 +544,6 @@ def my_books():
         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
         typer.secho(f"")
 
-        
         # getting the user id:
         user_id = util.db.sql_select(
             f"SELECT user_id from users WHERE user_name = '{session['username']}'")
@@ -558,42 +556,43 @@ def my_books():
             RIGHT JOIN logs ON books.book_id = logs.book_id 
             WHERE (logs.user_id = {user_id} AND logs.read = true)
         """, "fetchall")
-        if search_result:  
+        if search_result:
             typer.secho(f'Here are all the books you read', fg='white')
-            table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre']
+            table_headers = ['#', 'Book ID', 'Name',
+                             'Author', '# Pages', 'Genre']
             util.formating.print_table(table_headers, search_result)
             typer.secho(f'')
-        
+
         # Favorite books
-        #---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
         search_result = util.db.sql_select(f"""
             SELECT books.book_id, books.book_name, books.book_author, books.book_number_of_pages, books.book_genre FROM books 
             RIGHT JOIN logs ON books.book_id = logs.book_id 
             WHERE (logs.user_id = {user_id} AND logs.favorited = true)
         """, "fetchall")
-        if search_result:  
+        if search_result:
             typer.secho(f'And the books you have favorited', fg='white')
-            table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre']
+            table_headers = ['#', 'Book ID', 'Name',
+                             'Author', '# Pages', 'Genre']
             util.formating.print_table(table_headers, search_result)
             typer.secho(f'')
-   
+
     else:
         typer.secho("You need to login first.",  fg='red')
-
 
 
 @app.command("statistics")
 def statistics():
     util.formating.show_header()
-    
+
     if session:
         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
-        
+
         # getting the user id:
         user_id = util.db.sql_select(
             f"SELECT user_id from users WHERE user_name = '{session['username']}'")
         user_id = user_id[0][0]
-        
+
         search_result = util.db.sql_select(f"""
             SELECT COUNT(DISTINCT books.book_id), 
                 COUNT(DISTINCT books.book_author), 
@@ -602,20 +601,20 @@ def statistics():
             RIGHT JOIN logs ON books.book_id = logs.book_id 
             WHERE (logs.user_id = {user_id} AND logs.read = true)
         """, "fetchone")
-        
+
         # making table to print
         if search_result:
             table = []
-            fields=['Books', 'Authors', 'Genres', 'Total pages']
-            for i  in range(4):
+            fields = ['Books', 'Authors', 'Genres', 'Total pages']
+            for i in range(4):
                 row = f"{fields[i]} you read", search_result[i]
                 table.append(row)
-            
+
             typer.secho(f'')
-            table_headers = [ 'Statistics','Number']
+            table_headers = ['Statistics', 'Number']
             util.formating.print_table(table_headers, table, show_count=False)
             typer.secho(f'')
-        
+
     else:
         typer.secho("You need to login first.",  fg='red')
 #######################################################

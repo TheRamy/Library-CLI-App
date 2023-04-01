@@ -630,6 +630,8 @@ def borrow_book(book_id: int):
         typer.secho('')
         
         user_name = session['username']
+
+        
         borrowed = util.db.sql_select(
             f"""SELECT l.user_id FROM logs l WHERE l.borrowed = TRUE AND l.book_id = {book_id}""")
         if not borrowed:
@@ -647,14 +649,14 @@ def borrow_book(book_id: int):
             """
             util.db.sql_insert(query_1)
             util.db.sql_insert(query_2)
-            # query_3 = f"""
-            # SELECT book_id, borrowed FROM logs WHERE book_id = {book_id} ;
-            # """
-            # search_result = util.db.sql_select(query_3)
+            query_3 = f"""
+             SELECT book_id, borrowed FROM logs WHERE book_id = {book_id} ;
+             """
+            search_result = util.db.sql_select(query_3)
             typer.secho(
                 f"Thanks, {session['username']} for borrowing book {book_id}",  fg='green')
-            # table_headers = ['#', 'book_id', 'status']
-            # util.formating.print_table(table_headers, search_result)
+            table_headers = [ 'book_id', 'status']
+            util.formating.print_table(table_headers, search_result, show_count=False)
             typer.secho(f'')
         else:
             typer.secho(f'sorry book {book_id} is not available', fg='red')

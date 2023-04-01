@@ -364,20 +364,29 @@ def add_book():
         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
         typer.echo("Please enter required book info to add!")
         
-        name = typer.prompt("Name")
-        author = typer.prompt("Author")
-        page_count = typer.prompt("# Pages")
-        genre = typer.prompt("Genre")
+        name = "Suc ve Ceza" #typer.prompt("Name")
+        author = "Dostoyevski" #typer.prompt("Author")
+        page_count = 345 #typer.prompt("# Pages")
+        genre = "Drama" #typer.prompt("Genre") 
         book_count = 1
         
-        search_result = util.db.sql_select(f"""
+        sql = f"""
             SELECT * from books 
             WHERE ((lower('book_name') lower('%{name}%') AND lower('book_author') lower('%{author}%'))) 
-        """, "fetchall")
-        
+        """
+        print (sql)
+        search_result = util.db.sql_select(sql, "fetchall")
+
+        print(f"search_result is: {search_result}")
+
         if search_result:       # if there is same book in database then update only book_count
             book_count = search_result[0][5] + 1
             book_id = search_result[0][0] + 1
+
+            print(f"book_count is: {book_count}")
+
+            print(f"book_id is: {book_id}")
+
 
             util.db.sql_update(f"""
                 UPDATE books 
@@ -398,16 +407,19 @@ def add_book():
             WHERE ((lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%'))) 
         """, "fetchall")    
         book_id = search_result[0][0]
+        print(f"user_id is: {book_id}")
         
         # getting the user id:
         user_id = util.db.sql_select(
             f"SELECT user_id from users WHERE user_name = '{session['username']}'")
         user_id = user_id[0][0]
+        print(f"user_id is: {user_id}")
+
         
-        util.db.sql_insert(f"""
-            INSERT INTO logs (book_name, book_author, book_number_of_pages, book_genre, book_count) 
-            VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count}) 
-        """)            
+        # util.db.sql_insert(f"""
+        #     INSERT INTO logs (book_name, book_author, book_number_of_pages, book_genre, book_count) 
+        #     VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count}) 
+        # """)            
         
             
         typer.echo("Book is successfully added!")

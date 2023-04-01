@@ -551,33 +551,42 @@ def my_books():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@app.command("statistics")
+def statistics():
+    util.formating.show_header()
+    
+    if session:
+        typer.secho(f"Welcome back, {session['username']}!",  fg='green')
+        
+        # getting the user id:
+        user_id = util.db.sql_select(
+            f"SELECT user_id from users WHERE user_name = '{session['username']}'")
+        user_id = user_id[0][0]
+        
+        search_result = util.db.sql_select(f"""
+            SELECT COUNT(DISTINCT books.book_id), 
+                COUNT(DISTINCT books.book_author), 
+                COUNT(DISTINCT books.book_genre), 
+                SUM(books.book_number_of_pages) FROM books 
+            RIGHT JOIN logs ON books.book_id = logs.book_id 
+            WHERE (logs.user_id = {user_id} AND logs.read = true)
+        """, "fetchone")
+        
+        # making table to print
+        if search_result:
+            table = []
+            fields=['Books', 'Authors', 'Genres', 'Total']
+            for i  in range(4):
+                row = f"{fields[i]} you read", search_result[i]
+                table.append(row)
+            
+            typer.secho(f'')
+            table_headers = ['Statistics','Number']
+            util.formating.print_table(table_headers, table)
+            typer.secho(f'')
+        
+    else:
+        typer.secho("You need to login first.",  fg='red')
 #######################################################
 #######################################################
 # ~~~~~~~~~~~~~~~ THE END ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

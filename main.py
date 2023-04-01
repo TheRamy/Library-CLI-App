@@ -363,18 +363,18 @@ def add_book():
 
         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
         typer.echo("Please enter required book info to add!")
-        
+
         name = typer.prompt("Name: ")
         author = typer.prompt("Author: ")
         page_count = typer.prompt("Pages: ")
         genre = typer.prompt("Genre: ")
         book_count = 1
-        
+
         search_result = util.db.sql_select(f"""
             SELECT * from books 
             WHERE (lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%')) 
         """, "fetchall")
-        
+
         if search_result:
             book_count = search_result["book_count"] + 1
             util.db.sql_insert(f"""
@@ -387,7 +387,7 @@ def add_book():
                 INSERT INTO books (book_name, book_author, book_number_of_pages, book_genre, book_count) 
                 VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count}) 
             """)
-            
+
         typer.echo("Book is successfully added!")
 
     else:
@@ -396,68 +396,70 @@ def add_book():
 
 @app.command("borrow_book")
 def borrow_book(book_id: int, user_name: str):
-
     if session:
         typer.secho(
             f"Hello, {session['username']}! you are logged in",  fg='green')
         borrowed = util.db.sql_select(
-            f"""SELECT logs.user_id FROM logs WHERE logs.borrowed = TRUE AND logs.book_id = {book_id}""")
+            f"""SELECT l.user_id FROM logs l WHERE l.borrowed = TRUE AND l.book_id = {book_id}""")
         if not borrowed:
-
             query_1 = f"""
-            UPDATE logs
+            UPDATE logs l
             SET borrowed = TRUE
-
-            FROM logs INNER JOIN users ON logs.user_id=users.user_id INNER JOIN books ON books.book_id=logs.book_id
-
-            WHERE users.user_name = {user_name} AND  books.book_id = {book_id}
-
+            FROM users u, books b
+            WHERE l.user_id = u.user_id AND l.book_id = b.book_id AND u.user_name = '{user_name}' AND b.book_id = '{book_id}' AND b.book_count > 0;
             """
-
             query_2 = f"""
-            
-            UPDATE books
-            SET books.book_count =  CASE
-                WHEN books.book_id = {book_id} AND users.user_name = {user_name} THEN books.book_count-1
-                ELSE books.book_count
-                END
-            FROM books INNER JOIN logs ON books.book_id=logs.book_id INNER JOIN users ON logs.user_id = users.user_id;
+            UPDATE books b
+            SET book_count = book_count - 1
+            FROM logs l, users u
+            WHERE l.user_id = u.user_id AND l.book_id = b.book_id AND u.user_name = '{user_name}' AND b.book_id = '{book_id}' AND b.book_count > 0;
             """
-
-            util.db.sql_insert(query_2)
             util.db.sql_insert(query_1)
-
-            query_3 = """
-            
-            SELECT book_id book_count from books
-            WHERE book_id != 0 
-            ORDER BY book_id DESC
+            util.db.sql_insert(query_2)
+            query_3 = f"""
+            SELECT book_id, borrowed FROM logs WHERE book_id = {book_id} ;
             """
             search_result = util.db.sql_select(query_3)
             typer.secho(
                 f"Thanks, {session['username']}! you have borrowed book {book_id}",  fg='green')
-
-            table_headers = ['#', 'book_id', 'book_count']
+            table_headers = ['#', 'book_id', 'status']
             util.formating.print_table(table_headers, search_result)
             typer.secho(f'')
         else:
             typer.secho(f' sorry Book {book_id} is not available')
-
     else:
         typer.secho("You need to login first.",  fg='red')
 
 
 @app.command("fav_book")
-def fav_book(book_id, user_name):
+def fav_book(book_id: int, user_name: str,):
+
     if session:
+
         typer.secho(
             f"Hello, {session['username']}! you are logged in",  fg='green')
-        query = f""" update users
-        CASE 
-            WHEN logs.book_id = {book_id} AND {session['username']} = {user_name} THEN 
-            """
 
-        #######################################################
+        Favored = util.db.sql_select(
+            f"""SELECT l.user_id FROM logs l WHERE l.favorited = True AND l.book_id = {book_id}""")
+        if not Favored:
+            util.db.sql_insert(
+                f""" 
+            UPDATE logs AS l 
+            SET favorited = True
+            FROM users as u , books as b
+            WHERE l.user_id = u.user_id AND l.book_id = b.book_id AND u.user_name = '{user_name}' AND b.book_id = '{book_id}' ;
+                """
+            )
+
+            typer.secho(
+                f"Thanks, {session['username']}! you have added book {book_id} as the faviorte book",  fg='green')
+        else:
+            typer.secho(f'the book {book_id} is already your faviorte book')
+    #######################################################
+    else:
+        typer.secho("You need to login first.",  fg='red')
+        typer.secho(f"")
+
 
 @app.command("return_book")
 def return_book(book_id: int):
@@ -496,11 +498,6 @@ def return_book(book_id: int):
         typer.secho(f"")
 
 
-
-
-
-
-
 # @app.command("mark_read")
 # def mark_read(book_id: int):
 
@@ -519,7 +516,7 @@ def return_book(book_id: int):
 #         already_marked_as_read = util.db.sql_select(
 #             f""""""
 #             SELECT * from logs WHERE user_id = {user_id} and borrowed=TRUE and book_id = {book_id}
-            
+
 #             """)
 
 #         if already_marked_as_read:
@@ -540,17 +537,23 @@ def return_book(book_id: int):
 #         typer.secho("You need to login first.",  fg='red')
 
 
-
-
-
-
-
-
 #######################################################
 #######################################################
 # ~~~~~~~~~~~~~~~ THE END ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #######################################################
 #######################################################
+@app.command("showme")
+def showme():
+    query_1 = f"""
+    SELECT *
+    FROM logs
+    """
+    selected = util.db.sql_select(query_1)
+    table_headers = ['#', 'Log_ID', 'User_ID', 'Book_ID',
+                     'Borrowed', 'READ', 'Favorited', 'Added', 'Timestamp']
+    # removes colum number 6
+    util.formating.print_table(table_headers, selected)
+    typer.secho(f'')
 
 
 if __name__ == "__main__":

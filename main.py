@@ -372,9 +372,9 @@ def add_book():
         
         sql = f"""
             SELECT * from books 
-            WHERE ((lower('book_name') lower('%{name}%') AND lower('book_author') lower('%{author}%'))) 
+            WHERE ((lower('book_name') = lower('%{name}%') AND lower('book_author') = lower('%{author}%'))) 
         """
-        print (sql)
+        print(f"sql is: {sql}")
         search_result = util.db.sql_select(sql, "fetchall")
 
         print(f"search_result is: {search_result}")
@@ -407,7 +407,7 @@ def add_book():
             WHERE ((lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%'))) 
         """, "fetchall")    
         book_id = search_result[0][0]
-        print(f"user_id is: {book_id}")
+        print(f"book_id is: {book_id}")
         
         # getting the user id:
         user_id = util.db.sql_select(

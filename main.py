@@ -359,11 +359,13 @@ def add_book():
     util.formating.show_header()
     if session:
         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
-        typer.echo("Please enter required book info to add!")
-        name = typer.prompt("Name")
-        author = typer.prompt("Author")
-        page_count = typer.prompt("# Pages")
-        genre = typer.prompt("Genre")
+        typer.echo("")
+
+        typer.echo("Please enter the details of the book you want to add!")
+        name = typer.prompt("Name: ")
+        author = typer.prompt("Author: ")
+        page_count = typer.prompt("# Pages: ")
+        genre = typer.prompt("Genre: ")
         book_count = 1
         search_result = util.db.sql_select(f"""
             SELECT * from books
@@ -371,14 +373,14 @@ def add_book():
         """, "fetchall")
         if search_result:       # if there is same book in database then update only book_count
             book_count = search_result[0][5] + 1
-            print(book_count)
+
             util.db.sql_update(f"""
                 UPDATE books
                 SET book_count = {book_count}
                 WHERE (lower(book_name) = lower('{name}') AND lower(book_author) = lower('{author}'))
             """)
         else:
-            print('else')
+
             util.db.sql_insert(f"""
                 INSERT INTO books (book_name, book_author, book_number_of_pages, book_genre, book_count)
                 VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count})
@@ -399,9 +401,13 @@ def add_book():
             INSERT INTO logs (user_id, book_id, added)
             VALUES ('{user_id}', '{book_id}', True)
         """)
-        typer.echo("Book is successfully added!")
+        typer.echo("Book is successfully added!", fg='green')
+        typer.echo("")
+
     else:
         typer.secho("You need to login first.",  fg='red')
+        typer.echo("")
+
 
 
 @app.command("return_book")

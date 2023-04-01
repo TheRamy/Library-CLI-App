@@ -33,9 +33,9 @@ def truncate_all_tables_data():
 # truncate_all_tables_data()
 
 
-how_many_users = 20
+how_many_users = 0
 how_many_books = 100
-how_many_logs = how_many_books * 2
+how_many_logs = how_many_books * 4
 
 print ('Generating & inserting fake data into the 3 tables...')
 

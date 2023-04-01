@@ -12,6 +12,7 @@ import util.db
 import util.cli
 import util.session
 
+
 console = Console()
 app = typer.Typer()
 session = util.session.load()  # Load user sessions (if not expired)
@@ -391,6 +392,94 @@ def add_book():
 
     else:
         typer.secho("You need to login first.",  fg='red')
+
+
+@app.command("return_book")
+def return_book(book_id: int):
+
+    util.formating.show_header()
+
+    if session:
+
+        typer.secho(f"Welcome back, {session['username']}!",  fg='green')
+        typer.secho(f"")
+
+        # getting the user id:
+        user_id = util.db.sql_select(
+            f"SELECT user_id from users WHERE user_name = '{session['username']}'")
+        user_id = user_id[0][0]
+
+        book_borrowed_by_user = util.db.sql_select(
+            f"SELECT * from logs WHERE user_id = {user_id} and borrowed=TRUE and book_id = {book_id}")
+
+        if book_borrowed_by_user:
+
+            util.db.sql_update(f"""
+                UPDATE logs
+                set borrowed=false
+                WHERE user_id ={user_id} and book_id={book_id}
+            """)
+            typer.secho(f"Thanks for returning the book!", fg='green')
+            typer.secho(f"")
+
+        else:
+            typer.secho(f"This book is not borrowed by you.", fg='red')
+            typer.secho(f"")
+
+    else:
+        typer.secho("You need to login first.",  fg='red')
+        typer.secho(f"")
+
+
+
+
+
+
+
+# @app.command("mark_read")
+# def mark_read(book_id: int):
+
+#     util.formating.show_header()
+
+#     if session:
+
+#         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
+#         typer.secho(f"")
+
+#         # getting the user id:
+#         user_id = util.db.sql_select(
+#             f"SELECT user_id from users WHERE user_name = '{session['username']}'")
+#         user_id = user_id[0][0]
+
+#         already_marked_as_read = util.db.sql_select(
+#             f""""""
+#             SELECT * from logs WHERE user_id = {user_id} and borrowed=TRUE and book_id = {book_id}
+            
+#             """)
+
+#         if already_marked_as_read:
+
+#             util.db.sql_update(f"""
+#                 UPDATE logs
+#                 set borrowed=false
+#                 WHERE user_id ={user_id} and book_id={book_id}
+#             """)
+#             typer.secho(f"Thanks for returning the book!", fg='green')
+#             typer.secho(f"")
+
+#         else:
+#             typer.secho(f"This book is not borrowed by you.", fg='red')
+#             typer.secho(f"")
+
+#     else:
+#         typer.secho("You need to login first.",  fg='red')
+
+
+
+
+
+
+
 
 #######################################################
 #######################################################

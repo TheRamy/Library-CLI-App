@@ -387,6 +387,8 @@ def add_book():
                 INSERT INTO books (book_name, book_author, book_number_of_pages, book_genre, book_count) 
                 VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count}) 
             """)
+
+            #TODO for Kursad: also add an entry into the log tabe!
             
         typer.echo("Book is successfully added!")
 
@@ -410,7 +412,7 @@ def borrow_book(book_id, user_name):
         
         """
         util.db.sql_update(query)
-        
+
         typer.secho(
             f"Thanks, {session['username']}! you have borrowed book {book_id}",  fg='green')
     else:

@@ -92,3 +92,4 @@ def sql_insert(sql):
             cur.close()
             conn.close()
             # print("PostgreSQL connection is closed")
+

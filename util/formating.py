@@ -38,13 +38,16 @@ def show_header():
 
 def print_table(headers, table_db, columns_to_be_removed=None):
     """
-    Provide a list with header names you want and the result of the sql query result (fetchall) and it will return the table.
+    Provide a list with header names you want and the result 
+    of the sql query result (fetchall) and it will print the 
+    table. ~ramy
 
     :param headers: list of header names
     :param table_db: sql query result (fetchall)
-    :param columns_to_be_removed: list of column numbers to be removed (0-indexed) ~ramy
+    :param columns_to_be_removed: list of column numbers to be removed (0-indexed) 
     """
     table = Table(show_header=True, header_style="bold green")
+
     for i, header in enumerate(headers):
         if columns_to_be_removed is None or i not in columns_to_be_removed:
             table.add_column(header, style="dim", min_width=None, justify=True)

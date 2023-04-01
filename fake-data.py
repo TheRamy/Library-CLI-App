@@ -33,9 +33,11 @@ def truncate_all_tables_data():
 # truncate_all_tables_data()
 
 
-how_many_users = 1
-how_many_books = 1
-how_many_logs = 5  # how_many_books * 2
+how_many_users = 20
+how_many_books = 100
+how_many_logs = how_many_books * 2
+
+print ('Generating & inserting fake data into the 3 tables...')
 
 # insert data into users table
 for i in range(how_many_users):
@@ -55,8 +57,8 @@ for i in range(how_many_books):
 
     book_number_of_pages = fake.random_int(min=50, max=1000)
 
-    genres = ['Romance', 'Mystery', 'Thriller', 'Science Fiction',
-              'Fantasy', 'Horror', 'Historical Fiction']
+    genres = ['Romance', 'Mystery', 'Thriller', 'Fiction',
+              'Fantasy', 'Horror', 'History']
     book_genre = fake.random_element(elements=genres)
     book_count = fake.random_int(min=1, max=10)
     query = f"INSERT INTO public.books (book_name, book_author, book_number_of_pages, book_genre, book_count) VALUES ('{book_name}', '{book_author}', {book_number_of_pages}, '{book_genre}', {book_count})"
@@ -86,7 +88,7 @@ for i in range(how_many_logs):
     result = cur.fetchone()
     if result:
         print(
-            f"Data for book_id={book_id} with the combination borrowed={borrowed}, read={read}, favorited={favorited}, added={added} already exists")
+            f"data for book_id={book_id} with the combination borrowed={borrowed}, read={read}, favorited={favorited}, added={added} already exists")
         continue
 
     if sum([borrowed, read, favorited, added]) != 1:

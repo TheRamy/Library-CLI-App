@@ -4,7 +4,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress
 from typing import Optional
-# import inquirer
+import inquirer
 
 
 import util.formating
@@ -49,28 +49,64 @@ def start():
             f"Welcome back, {session['username']}!", fg=typer.colors.BRIGHT_YELLOW)
         print('')
 
-        ##################################################################
-        ##################################################################
-
-        # choices_without_login   =['sign_up', 'search_by_name']
-        # choices_with_login_only =['sign_up', 'search_by_name']
-
-        # ask = [inquirer.List('run_command', message="What would you like to do?", choices=choices_without_login)]
-
-        # answer = inquirer.prompt(ask)
-        # #print(answer['run_command'])
-
-        # if answer['run_command'] == "search_by_name":
-
-        #     bookName = typer.prompt("What's the book name you're looking for?")
-        #     search_by_name(f'{bookName}')
-
-        ##################################################################
-        ##################################################################
+        choices = ['sign_up', 'sign_in', 'search_by_name',
+                   'search_by_author', 'recently_added', 'most_read_books', 'most_favorite_books', 'most_read_genres', 'most_read_authors',
+                   'add_book', 'borrow_book', 'return_book', 'mark_read', 'fav_book', 'my_books', 'statistics'
+                   ]
 
     else:
         typer.secho(f"You are not logged in!", fg=typer.colors.BRIGHT_YELLOW)
         print('')
+        choices = ['sign_up', 'sign_in', 'search_by_name',
+                   'search_by_author', 'recently_added', 'most_read_books', 'most_favorite_books', 'most_read_genres', 'most_read_authors']
+
+    #################################################################
+    #################################################################
+
+    ask = [inquirer.List(
+        'run_command', message="What would you like to do?", choices=choices)]
+
+    answer = inquirer.prompt(ask)
+
+    if answer['run_command'] == "sign_up":
+
+        username = typer.prompt("What's the username you want: ")
+        sign_up(username)
+    elif answer['run_command'] == "sign_in":
+
+        username = typer.prompt("What's your username: ")
+        password = typer.prompt("What's your password: ", hide_input=True)
+
+        sign_in(username, password)
+    elif answer['run_command'] == "search_by_name":
+
+        bookName = typer.prompt("What's the book name you're looking for?")
+        search_by_name(f'{bookName}')
+    elif answer['run_command'] == "search_by_author":
+
+        author = typer.prompt("What's the author you're looking for?")
+        search_by_author(f'{author}')
+    elif answer['run_command'] == "recently_added":
+
+        genre = typer.prompt("Any genre in mind (optional)?", default='')
+        recently_added(f'{genre}')
+    elif answer['run_command'] == "most_read_books":
+
+        genre = typer.prompt("Any genre in mind (optional)?", default='')
+        most_read_books(f'{genre}')
+    elif answer['run_command'] == "most_favorite_books":
+
+        genre = typer.prompt("Any genre in mind (optional)?", default='')
+        most_favorite_books(f'{genre}')
+    elif answer['run_command'] == "most_read_genres":
+
+        most_read_genres()
+    elif answer['run_command'] == "most_read_authors":
+
+        most_read_authors()
+
+    #################################################################
+    #################################################################
 
 
 @app.command("sign_up")
@@ -190,10 +226,6 @@ def recently_added(genre: Optional[str] = typer.Argument(None)):
         typer.secho(f'')
 
 
-
-
-
-
 @app.command("most_read_books")
 def most_read_books(genre: Optional[str] = typer.Argument(None)):
 
@@ -211,7 +243,8 @@ def most_read_books(genre: Optional[str] = typer.Argument(None)):
             LIMIT 10;
         """, "fetchall")
 
-        typer.secho(f'Here are the 10 most read books in the genre {genre}:', fg='white')
+        typer.secho(
+            f'Here are the 10 most read books in the genre {genre}:', fg='white')
         table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
         util.formating.print_table(table_headers, search_result)
         typer.secho(f'')
@@ -233,11 +266,6 @@ def most_read_books(genre: Optional[str] = typer.Argument(None)):
         typer.secho(f'')
 
 
-
-
-
-
-
 @app.command("most_favorite_books")
 def most_favorite_books(genre: Optional[str] = typer.Argument(None)):
 
@@ -255,7 +283,8 @@ def most_favorite_books(genre: Optional[str] = typer.Argument(None)):
             LIMIT 10;
         """, "fetchall")
 
-        typer.secho(f'Here are the 10 most favorited books in the genre {genre}:', fg='white')
+        typer.secho(
+            f'Here are the 10 most favorited books in the genre {genre}:', fg='white')
         table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
         util.formating.print_table(table_headers, search_result)
         typer.secho(f'')
@@ -277,35 +306,47 @@ def most_favorite_books(genre: Optional[str] = typer.Argument(None)):
         typer.secho(f'')
 
 
+@app.command("most_read_genres")
+def most_read_genres():
+
+    util.formating.show_header()
+
+    search_result = util.db.sql_select(f"""
+        SELECT books.book_genre, COUNT(DISTINCT logs.user_id) as read_count
+        FROM books
+        JOIN logs ON books.book_id = logs.book_id
+        WHERE logs.read = TRUE
+        GROUP BY books.book_genre
+        ORDER BY read_count DESC
+        LIMIT 5;
+    """, "fetchall")
+
+    typer.secho(f'Here are the 5 most read book genres:', fg='white')
+    table_headers = ['#', 'Genre', 'Count']
+    util.formating.print_table(table_headers, search_result)
+    typer.secho(f'')
 
 
+@app.command("most_read_authors")
+def most_read_authors():
 
+    util.formating.show_header()
 
+    search_result = util.db.sql_select(f"""
+        SELECT books.book_author, COUNT(DISTINCT logs.user_id) as read_count
+        FROM books
+        JOIN logs ON books.book_id = logs.book_id
+        WHERE logs.read = TRUE
+        GROUP BY books.book_author
+        ORDER BY read_count DESC
+        LIMIT 5;
+    """, "fetchall")
 
+    typer.secho(f'Here are the 5 most read book authors:', fg='white')
+    table_headers = ['#', 'Author', 'Count']
+    util.formating.print_table(table_headers, search_result)
+    typer.secho(f'')
 
-
-
-
-
-
-
-
-
-# @app.command("display_table")
-# def display_table():
-
-#     console.clear()
-
-#     table = Table(show_header=True, header_style="bold blue")
-#     table.add_column("Column 1", style="dim", width=10)
-#     table.add_column("Column 2", style="dim", min_width=10, justify=True)
-
-#     # util.db.example_table()
-#     table_db = util.db.sql_select("SELECT * FROM cool_table", "fetchall")
-#     for row in table_db:
-#         table.add_row(row[1], row[2])
-
-#     console.print(table)
 
 #######################################################
 #######################################################

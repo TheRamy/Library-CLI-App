@@ -359,11 +359,13 @@ def add_book():
     util.formating.show_header()
     if session:
         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
-        typer.echo("Please enter required book info to add!")
-        name = typer.prompt("Name")
-        author = typer.prompt("Author")
-        page_count = typer.prompt("# Pages")
-        genre = typer.prompt("Genre")
+        typer.echo("")
+
+        typer.echo("Please enter the details of the book you want to add!")
+        name = typer.prompt("Name: ")
+        author = typer.prompt("Author: ")
+        page_count = typer.prompt("# Pages: ")
+        genre = typer.prompt("Genre: ")
         book_count = 1
         search_result = util.db.sql_select(f"""
             SELECT * from books
@@ -371,13 +373,14 @@ def add_book():
         """, "fetchall")
         if search_result:       # if there is same book in database then update only book_count
             book_count = search_result[0][5] + 1
+
             util.db.sql_update(f"""
                 UPDATE books
                 SET book_count = {book_count}
                 WHERE (lower(book_name) = lower('{name}') AND lower(book_author) = lower('{author}'))
             """)
         else:
-            print('else')
+
             util.db.sql_insert(f"""
                 INSERT INTO books (book_name, book_author, book_number_of_pages, book_genre, book_count)
                 VALUES ('{name}', '{author}', {page_count}, '{genre}', {book_count})
@@ -398,9 +401,13 @@ def add_book():
             INSERT INTO logs (user_id, book_id, added)
             VALUES ('{user_id}', '{book_id}', True)
         """)
-        typer.echo("Book is successfully added!")
+        typer.echo("Book is successfully added!", fg='green')
+        typer.echo("")
+
     else:
         typer.secho("You need to login first.",  fg='red')
+        typer.echo("")
+
 
 
 @app.command("return_book")
@@ -441,47 +448,39 @@ def return_book(book_id: int):
 
 
 
+@app.command("mark_read")
+def mark_read(book_id: int):
 
+    util.formating.show_header()
 
+    if session:
 
+        typer.secho(f"Welcome back, {session['username']}!",  fg='green')
+        typer.secho(f"")
 
-# @app.command("mark_read")
-# def mark_read(book_id: int):
+        # getting the user id:
+        user_id = util.db.sql_select(
+            f"SELECT user_id from users WHERE user_name = '{session['username']}'")
+        user_id = user_id[0][0]
 
-#     util.formating.show_header()
+        already_marked_as_read = util.db.sql_select(f"SELECT * from logs WHERE user_id = {user_id} and read=TRUE and book_id = {book_id}")
 
-#     if session:
+        if already_marked_as_read:
 
-#         typer.secho(f"Welcome back, {session['username']}!",  fg='green')
-#         typer.secho(f"")
+            # util.db.sql_update(f"""
+            #     UPDATE logs
+            #     set borrowed=false
+            #     WHERE user_id ={user_id} and book_id={book_id}
+            # """)
+            typer.secho(f"Book id {book_id} is already marked as read!", fg='green')
+            typer.secho(f"")
 
-#         # getting the user id:
-#         user_id = util.db.sql_select(
-#             f"SELECT user_id from users WHERE user_name = '{session['username']}'")
-#         user_id = user_id[0][0]
+        else:
+            typer.secho(f"Marked book id {book_id} as read!", fg='red')
+            typer.secho(f"")
 
-#         already_marked_as_read = util.db.sql_select(
-#             f""""""
-#             SELECT * from logs WHERE user_id = {user_id} and borrowed=TRUE and book_id = {book_id}
-            
-#             """)
-
-#         if already_marked_as_read:
-
-#             util.db.sql_update(f"""
-#                 UPDATE logs
-#                 set borrowed=false
-#                 WHERE user_id ={user_id} and book_id={book_id}
-#             """)
-#             typer.secho(f"Thanks for returning the book!", fg='green')
-#             typer.secho(f"")
-
-#         else:
-#             typer.secho(f"This book is not borrowed by you.", fg='red')
-#             typer.secho(f"")
-
-#     else:
-#         typer.secho("You need to login first.",  fg='red')
+    else:
+        typer.secho("You need to login first.",  fg='red')
 
 
 

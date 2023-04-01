@@ -93,3 +93,31 @@ def sql_insert(sql):
             conn.close()
             # print("PostgreSQL connection is closed")
 
+
+def sql_update(sql):
+    """You can use this to run update SQL. ~ramy """
+
+    try:
+
+        # read connection parameters
+        params = db_config()
+
+        # connect to the PostgreSQL server
+        # print('Connecting to the PostgreSQL database...')
+        conn = psycopg2.connect(**params)
+        # create a cursor
+        cur = conn.cursor()
+
+        cur.execute(sql)
+        conn.commit()
+
+    except (Exception, psycopg2.Error) as error:
+        print("error: ", error)
+
+    finally:
+        # closing database connection.
+        if conn:
+            cur.close()
+            conn.close()
+            # print("PostgreSQL connection is closed")
+

@@ -120,10 +120,21 @@ def start():
 
         book_id = typer.prompt("What's the book id that you want marked as read?")
         mark_read(book_id)
-    elif answer['run_command'] == "mark_read":
+    elif answer['run_command'] == "fav_book":
 
-        book_id = typer.prompt("What's the book id that you want marked as read?")
-        mark_read(book_id)
+        #book_id = typer.prompt("What's the book id that you want marked as read?")
+        #fav_book(book_id)
+        pass
+    elif answer['run_command'] == "my_books":
+
+        my_books()
+    elif answer['run_command'] == "statistics":
+
+        statistics()
+         
+
+
+
 
 
     #################################################################

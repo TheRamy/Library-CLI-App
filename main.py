@@ -575,14 +575,14 @@ def statistics():
         # making table to print
         if search_result:
             table = []
-            fields=['Books', 'Authors', 'Genres', 'Total']
+            fields=['Books', 'Authors', 'Genres', 'Total pages']
             for i  in range(4):
                 row = f"{fields[i]} you read", search_result[i]
                 table.append(row)
             
             typer.secho(f'')
-            table_headers = ['Statistics','Number']
-            util.formating.print_table(table_headers, table)
+            table_headers = [ 'Statistics','Number']
+            util.formating.print_table(table_headers, table, show_count=False)
             typer.secho(f'')
         
     else:

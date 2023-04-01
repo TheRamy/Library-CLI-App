@@ -372,7 +372,7 @@ def add_book():
         
         search_result = util.db.sql_select(f"""
             SELECT * from books 
-            WHERE ((lower(book_name) LIKE lower('%{name}%') AND lower(book_author) LIKE lower('%{author}%'))) 
+            WHERE ((lower('book_name') LIKE lower('%{name}%') AND lower('book_author') LIKE lower('%{author}%'))) 
         """, "fetchall")
         
         if search_result:
@@ -381,7 +381,7 @@ def add_book():
             util.db.sql_update(f"""
                 UPDATE books 
                 SET book_count = {book_count}
-                WHERE ((lower(book_name) = lower('%{name}%') AND lower(book_author) = lower('%{author}%'))) 
+                WHERE ((lower('book_name') = lower('%{name}%') AND lower('book_author') = lower('%{author}%'))) 
             """)
         else:
             util.db.sql_insert(f"""

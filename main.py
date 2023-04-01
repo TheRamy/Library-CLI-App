@@ -617,6 +617,75 @@ def statistics():
 
     else:
         typer.secho("You need to login first.",  fg='red')
+
+
+@app.command("borrow_book")
+def borrow_book(book_id: int, user_name: str):
+    if session:
+        typer.secho(
+            f"Hello, {session['username']}! you are logged in",  fg='green')
+        borrowed = util.db.sql_select(
+            f"""SELECT l.user_id FROM logs l WHERE l.borrowed = TRUE AND l.book_id = {book_id}""")
+        if not borrowed:
+            query_1 = f"""
+            UPDATE logs l
+            SET borrowed = TRUE
+            FROM users u, books b
+            WHERE l.user_id = u.user_id AND l.book_id = b.book_id AND u.user_name = '{user_name}' AND b.book_id = '{book_id}' AND b.book_count > 0;
+            """
+            query_2 = f"""
+            UPDATE books b
+            SET book_count = book_count - 1
+            FROM logs l, users u
+            WHERE l.user_id = u.user_id AND l.book_id = b.book_id AND u.user_name = '{user_name}' AND b.book_id = '{book_id}' AND b.book_count > 0;
+            """
+            util.db.sql_insert(query_1)
+            util.db.sql_insert(query_2)
+            query_3 = f"""
+            SELECT book_id, borrowed FROM logs WHERE book_id = {book_id} ;
+            """
+            search_result = util.db.sql_select(query_3)
+            typer.secho(
+                f"Thanks, {session['username']}! you have borrowed book {book_id}",  fg='green')
+            table_headers = ['#', 'book_id', 'status']
+            util.formating.print_table(table_headers, search_result)
+            typer.secho(f'')
+        else:
+            typer.secho(f' sorry Book {book_id} is not available')
+    else:
+        typer.secho("You need to login first.",  fg='red')
+
+
+@app.command("fav_book")
+def fav_book(book_id: int, user_name: str,):
+
+    if session:
+
+        typer.secho(
+            f"Hello, {session['username']}! you are logged in",  fg='green')
+
+        Favored = util.db.sql_select(
+            f"""SELECT l.user_id FROM logs l WHERE l.favorited = True AND l.book_id = {book_id}""")
+        if not Favored:
+            util.db.sql_insert(
+                f""" 
+            UPDATE logs AS l 
+            SET favorited = True
+            FROM users as u , books as b
+            WHERE l.user_id = u.user_id AND l.book_id = b.book_id AND u.user_name = '{user_name}' AND b.book_id = '{book_id}' ;
+                """
+            )
+
+            typer.secho(
+                f"Thanks, {session['username']}! you have added book {book_id} as the faviorte book",  fg='green')
+        else:
+            typer.secho(f'the book {book_id} is already your faviorte book')
+    #######################################################
+    else:
+        typer.secho("You need to login first.",  fg='red')
+        typer.secho(f"")
+
+
 #######################################################
 #######################################################
 # ~~~~~~~~~~~~~~~ THE END ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

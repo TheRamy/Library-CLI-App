@@ -448,10 +448,6 @@ def return_book(book_id: int):
 
 
 
-
-
-
-
 @app.command("mark_read")
 def mark_read(book_id: int):
 
@@ -511,7 +507,45 @@ def mark_read(book_id: int):
 
 
 
+@app.command("my_books")
+def my_books():
+    util.formating.show_header()
+    if session:
+        typer.secho(f"Welcome back, {session['username']}!",  fg='green')
+        
+        # getting the user id:
+        user_id = util.db.sql_select(
+            f"SELECT user_id from users WHERE user_name = '{session['username']}'")
+        user_id = user_id[0][0]
 
+        # Read books
+        # ----------------------------------------------------------------------
+        search_result = util.db.sql_select(f"""
+            SELECT books.book_id, books.book_name, books.book_author, books.book_number_of_pages, books.book_genre FROM books 
+            RIGHT JOIN logs ON books.book_id = logs.book_id 
+            WHERE (logs.user_id = {user_id} AND logs.read = true)
+        """, "fetchall")
+        if search_result:  
+            typer.secho(f'Here are all the books you read', fg='white')
+            table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre']
+            util.formating.print_table(table_headers, search_result)
+            typer.secho(f'')
+        
+        # Favorite books
+        #---------------------------------------------------------------------------
+        search_result = util.db.sql_select(f"""
+            SELECT books.book_id, books.book_name, books.book_author, books.book_number_of_pages, books.book_genre FROM books 
+            RIGHT JOIN logs ON books.book_id = logs.book_id 
+            WHERE (logs.user_id = {user_id} AND logs.favorited = true)
+        """, "fetchall")
+        if search_result:  
+            typer.secho(f'And the books you have favorited', fg='white')
+            table_headers = ['#', 'Book ID', 'Name', 'Author', '# Pages', 'Genre']
+            util.formating.print_table(table_headers, search_result)
+            typer.secho(f'')
+   
+    else:
+        typer.secho("You need to login first.",  fg='red')
 
 
 

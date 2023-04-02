@@ -384,6 +384,7 @@ def most_read_authors():
 # Commands that require the user to be logged in first!
 #######################################################
 #######################################################
+
 @app.command("add_book")
 def add_book():
     util.formating.show_header()
@@ -438,7 +439,6 @@ def add_book():
         typer.secho("You need to login first.",  fg='red')
         typer.echo("")
 
-
 @app.command("return_book")
 def return_book(book_id: int):
 
@@ -460,10 +460,16 @@ def return_book(book_id: int):
         if book_borrowed_by_user:
 
             util.db.sql_update(f"""
-                UPDATE logs
-                set borrowed=false
+                DELETE FROM logs 
                 WHERE user_id ={user_id} and book_id={book_id}
             """)
+
+            util.db.sql_update(f"""
+                UPDATE books
+                SET book_count = book_count + 1
+                WHERE book_id = {book_id}
+            """)
+
             typer.secho(f"Thanks for returning the book!", fg='green')
             typer.secho(f"")
 
@@ -747,6 +753,9 @@ def showme():
     # removes colum number 6
     util.formating.print_table(table_headers, selected)
     typer.secho(f'')
+
+
+
 
 
 if __name__ == "__main__":

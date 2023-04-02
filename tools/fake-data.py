@@ -1,76 +1,66 @@
-from datetime import datetime
-from faker import Faker
-import psycopg2
-import pytz
+#####################################
+#####################################
+# How many random data to generate?
+how_many_users = 4
+how_many_books = 50
+how_many_logs = how_many_books * 4
+#####################################
+#####################################
+
 from util.db import db_config
+import pytz
+import psycopg2
+from faker import Faker
+import time
+from datetime import datetime
+
+
 
 fake = Faker()
-
 params = db_config()
 conn = psycopg2.connect(**params)
 cur = conn.cursor()
 
 
-def truncate_all_tables_data():
-    """Delete all data in all tables in the database. ~ramy"""
+# Find all table names
+cur.execute(
+    "SELECT table_name FROM information_schema.tables WHERE table_schema='public';")
+tables = cur.fetchall()
 
-    # Find all table names
-    cur.execute(
-        "SELECT table_name FROM information_schema.tables WHERE table_schema='public';")
-    tables = cur.fetchall()
-
-    # Truncate all tables
-    for table in tables:
-        cur.execute(f"TRUNCATE TABLE {table[0]} CASCADE;")
-        conn.commit()
-
-
-    # Restart IDs and add default users
-    cur.execute("""
-        ALTER SEQUENCE users_user_id_seq RESTART WITH 1;
-        ALTER SEQUENCE books_book_id_seq RESTART WITH 100;
-        ALTER SEQUENCE logs_log_id_seq RESTART WITH 1;
-
-        INSERT INTO users (user_name, user_password) VALUES('Ramy', '123');
-        INSERT INTO users (user_name, user_password) VALUES('Tabali', '123');
-        INSERT INTO users (user_name, user_password) VALUES('Kursad', '123');
-    """)
+# Truncate all tables
+for table in tables:
+    cur.execute(f"TRUNCATE TABLE {table[0]} CASCADE;")
     conn.commit()
 
 
+# Restart IDs and add default users
+cur.execute("""
+    ALTER SEQUENCE users_user_id_seq RESTART WITH 1;
+    ALTER SEQUENCE books_book_id_seq RESTART WITH 100;
+    ALTER SEQUENCE logs_log_id_seq RESTART WITH 1;
 
-    # Close the cursor and the connection
-    cur.close()
-    conn.close()
-    print("all data from all tables deleted!")
-    exit()
+    INSERT INTO users (user_name, user_password) VALUES('Tabali', '123');
+    INSERT INTO users (user_name, user_password) VALUES('Kursad', '123');
+    INSERT INTO users (user_name, user_password) VALUES('Ramy', '123');
+    INSERT INTO users (user_name, user_password) VALUES('Ziad', '123');
 
-# truncate_all_tables_data()
-# exit()
+""")
+conn.commit()
 
-
-
-# ALTER SEQUENCE users_user_id_seq RESTART WITH 1;
-# ALTER SEQUENCE books_book_id_seq RESTART WITH 100;
-# ALTER SEQUENCE logs_log_id_seq RESTART WITH 1;
-
-# INSERT INTO users (user_name, user_password) VALUES('Ramy', '123')
-# INSERT INTO users (user_name, user_password) VALUES('Tabali', '123')
-# INSERT INTO users (user_name, user_password) VALUES('Kursad', '123')
-
+# # Close the cursor and the connection
+# cur.close()
+# conn.close()
+print("all data from all tables deleted!")
 
 
+time.sleep(2)
 
 
-how_many_users = 4
-how_many_books = 100
-how_many_logs = how_many_books * 4
-
-print ('Generating & inserting fake data into the 3 tables...')
+print('Generating & inserting fake data into the 3 tables...')
 
 # insert data into users table
 for i in range(how_many_users):
-    user_name = fake.user_name()
+    user_name = fake.first_name()
     user_password = fake.password()
     query = f"INSERT INTO public.users (user_name, user_password) VALUES ('{user_name}', '{user_password}')"
     cur.execute(query)
@@ -148,3 +138,4 @@ conn.commit()
 
 cur.close()
 conn.close()
+print ('ALL DONE!')

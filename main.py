@@ -687,18 +687,19 @@ def borrow_book(book_id: int):
                 """
                 util.db.sql_update(query_4)
 
+                time.sleep (1)
                 # Show borrowing details
                 query_5 = f"""
-                SELECT book_id, borrowed 
+                SELECT book_id, timestamp
                 FROM logs 
                 WHERE book_id = {book_id} AND user_id = (SELECT user_id FROM users WHERE user_name = '{user_name}');
                 """
                 search_result = util.db.sql_select(query_5)
                 typer.secho(
-                    f"Thanks, {session['username']} for borrowing book {book_id}",  fg='green')
-                table_headers = ['book_id', 'status']
-                util.formating.print_table(
-                    table_headers, search_result, show_count=False)
+                    f"Thanks for borrowing book {book_id}: ",  fg='green')
+                table_headers = ['Book ID', 'Borrowed on']
+                util.formating.print_table(table_headers, search_result, show_count=False)
+
                 typer.secho(f'')
 
     else:

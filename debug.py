@@ -31,7 +31,7 @@ conn = psycopg2.connect(**params)
 # Define function to retrieve book data from database
 def get_books():
     cur = conn.cursor()
-    cur.execute("SELECT book_id, book_name, book_author, book_genre FROM books")
+    cur.execute("SELECT book_id, book_name, book_author, book_genre FROM books ORDER BY book_id")
     books = cur.fetchall()
     return books
 

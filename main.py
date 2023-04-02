@@ -200,7 +200,7 @@ def search_by_author(author: str):
         typer.secho(
             f'You searched for books by author with the name "{author}" so here is the result:', fg='white')
 
-        table_headers = ['#', 'Book ID', 'Name',
+        table_headers = ['Book ID', 'Name',
                          'Author', '# Pages', 'Genre', 'Availability']
         util.formating.print_table(table_headers, search_result)
         console.print('')
@@ -231,7 +231,7 @@ def recently_added(genre: Optional[str] = typer.Argument(None)):
         typer.secho(
             f'Here are the 5 most recently added books in the genre "{genre}": ', fg='white')
 
-        table_headers = ['#', 'Book ID', 'Name', 'Author',
+        table_headers = [ 'Book ID', 'Name', 'Author',
                          '# Pages', 'Genre', '', 'Availability', 'Added by']
         util.formating.print_table(table_headers, search_result, [
                                    6])  # removes colum number 6
@@ -250,7 +250,7 @@ def recently_added(genre: Optional[str] = typer.Argument(None)):
         """, "fetchall")
 
         typer.secho(f'Here are the 5 most recently added books:', fg='white')
-        table_headers = ['#', 'Book ID', 'Name', 'Author',
+        table_headers = ['Book ID', 'Name', 'Author',
                          '# Pages', 'Genre', '', 'Availability', 'Added by']
         util.formating.print_table(table_headers, search_result, [
                                    6])  # removes colum number 6
@@ -276,7 +276,7 @@ def most_read_books(genre: Optional[str] = typer.Argument(None)):
 
         typer.secho(
             f'Here are the 10 most read books in the genre {genre}:', fg='white')
-        table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
+        table_headers = ['Book ID', 'Name', 'Author', 'Genre', 'Count']
         util.formating.print_table(table_headers, search_result)
         typer.secho(f'')
 
@@ -292,7 +292,7 @@ def most_read_books(genre: Optional[str] = typer.Argument(None)):
         """, "fetchall")
 
         typer.secho(f'Here are the 10 most read books:', fg='white')
-        table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
+        table_headers = ['Book ID', 'Name', 'Author', 'Genre', 'Count']
         util.formating.print_table(table_headers, search_result)
         typer.secho(f'')
 
@@ -316,7 +316,7 @@ def most_favorite_books(genre: Optional[str] = typer.Argument(None)):
 
         typer.secho(
             f'Here are the 10 most favorited books in the genre {genre}:', fg='white')
-        table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
+        table_headers = ['Book ID', 'Name', 'Author', 'Genre', 'Count']
         util.formating.print_table(table_headers, search_result)
         typer.secho(f'')
 
@@ -332,7 +332,7 @@ def most_favorite_books(genre: Optional[str] = typer.Argument(None)):
         """, "fetchall")
 
         typer.secho(f'Here are the 10 most favorited books:', fg='white')
-        table_headers = ['#', 'Book ID', 'Name', 'Author', 'Genre', 'Count']
+        table_headers = ['Book ID', 'Name', 'Author', 'Genre', 'Count']
         util.formating.print_table(table_headers, search_result)
         typer.secho(f'')
 
@@ -353,7 +353,7 @@ def most_read_genres():
     """, "fetchall")
 
     typer.secho(f'Here are the 5 most read book genres:', fg='white')
-    table_headers = ['#', 'Genre', 'Count']
+    table_headers = ['Genre', 'Count']
     util.formating.print_table(table_headers, search_result)
     typer.secho(f'')
 
@@ -374,7 +374,7 @@ def most_read_authors():
     """, "fetchall")
 
     typer.secho(f'Here are the 5 most read book authors:', fg='white')
-    table_headers = ['#', 'Author', 'Count']
+    table_headers = ['Author', 'Count']
     util.formating.print_table(table_headers, search_result)
     typer.secho(f'')
 
@@ -565,8 +565,8 @@ def my_books():
             WHERE (logs.user_id = {user_id} AND logs.read = true)
         """, "fetchall")
         if search_result:
-            typer.secho(f'Here are all the books you read', fg='white')
-            table_headers = ['#', 'Book ID', 'Name',
+            typer.secho(f'Here are all the books you read: ', fg='white')
+            table_headers = ['Book ID', 'Name',
                              'Author', '# Pages', 'Genre']
             util.formating.print_table(table_headers, search_result)
             typer.secho(f'')
@@ -579,8 +579,23 @@ def my_books():
             WHERE (logs.user_id = {user_id} AND logs.favorited = true)
         """, "fetchall")
         if search_result:
-            typer.secho(f'And the books you have favorited', fg='white')
-            table_headers = ['#', 'Book ID', 'Name',
+            typer.secho(f'And the books you have favorited: ', fg='white')
+            table_headers = ['Book ID', 'Name',
+                             'Author', '# Pages', 'Genre']
+            util.formating.print_table(table_headers, search_result)
+            typer.secho(f'')
+
+
+        # Borrowed books
+        # ---------------------------------------------------------------------------
+        search_result = util.db.sql_select(f"""
+            SELECT books.book_id, books.book_name, books.book_author, books.book_number_of_pages, books.book_genre FROM books 
+            RIGHT JOIN logs ON books.book_id = logs.book_id 
+            WHERE (logs.user_id = {user_id} AND logs.borrowed = true)
+        """, "fetchall")
+        if search_result:
+            typer.secho(f'And the books you have borrowed: ', fg='white')
+            table_headers = ['Book ID', 'Name',
                              'Author', '# Pages', 'Genre']
             util.formating.print_table(table_headers, search_result)
             typer.secho(f'')
@@ -749,7 +764,7 @@ def showme():
     FROM logs
     """
     selected = util.db.sql_select(query_1)
-    table_headers = ['#', 'Log_ID', 'User_ID', 'Book_ID',
+    table_headers = ['Log_ID', 'User_ID', 'Book_ID',
                      'Borrowed', 'READ', 'Favorited', 'Added', 'Timestamp']
     # removes colum number 6
     util.formating.print_table(table_headers, selected)

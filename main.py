@@ -110,7 +110,8 @@ def start():
         add_book()
     elif answer['run_command'] == "borrow_book":
 
-        book_id = typer.prompt("What's the book id of the book you're returning?")
+        book_id = typer.prompt(
+            "What's the book id of the book you're returning?")
         borrow_book(book_id)
         pass
     elif answer['run_command'] == "return_book":
@@ -628,43 +629,64 @@ def borrow_book(book_id: int):
         typer.secho(
             f"Hello, {session['username']}! you are logged in",  fg='green')
         typer.secho('')
-        
+
         user_name = session['username']
 
+        book_available = util.db.sql_select(
+            f"""SELECT book_count FROM books WHERE book_id = {book_id} AND book_count > 0""")
         
-        borrowed = util.db.sql_select(
-            f"""SELECT l.user_id FROM logs l WHERE l.borrowed = TRUE AND l.book_id = {book_id}""")
-        if not borrowed:
-            query_1 = f"""
-            UPDATE logs l
-            SET borrowed = TRUE
-            FROM users u, books b
-            WHERE l.user_id = u.user_id AND l.book_id = b.book_id AND u.user_name = '{user_name}' AND b.book_id = '{book_id}' AND b.book_count > 0;
-            """
-            query_2 = f"""
-            UPDATE books b
-            SET book_count = book_count - 1
-            FROM logs l, users u
-            WHERE l.user_id = u.user_id AND l.book_id = b.book_id AND u.user_name = '{user_name}' AND b.book_id = '{book_id}' AND b.book_count > 0;
-            """
-            util.db.sql_insert(query_1)
-            util.db.sql_insert(query_2)
-            query_3 = f"""
-             SELECT book_id, borrowed FROM logs WHERE book_id = {book_id} ;
-             """
-            search_result = util.db.sql_select(query_3)
-            typer.secho(
-                f"Thanks, {session['username']} for borrowing book {book_id}",  fg='green')
-            table_headers = [ 'book_id', 'status']
-            util.formating.print_table(table_headers, search_result, show_count=False)
-            typer.secho(f'')
-        else:
+        if not book_available:
             typer.secho(f'sorry book {book_id} is not available', fg='red')
             typer.secho(f'')
+        else:
+            book_already_borrowed = util.db.sql_select(
+                f"""SELECT 1 FROM logs WHERE borrowed = TRUE AND book_id = {book_id} AND user_id = (SELECT user_id FROM users WHERE user_name = '{user_name}')""")
+            if book_already_borrowed:
+                typer.secho(f'you already borrowed one copy bro', fg='red')
+                typer.secho(f'')
+            else:
+                query_1 = f"""
+                INSERT INTO logs (user_id, book_id, borrowed)
+                SELECT u.user_id, b.book_id, TRUE
+                FROM users u, books b
+                WHERE u.user_name = '{user_name}' 
+                  AND b.book_id = '{book_id}' 
+                  AND b.book_count > 0 
+                  AND NOT EXISTS (
+                    SELECT 1
+                    FROM logs l
+                    WHERE l.borrowed = TRUE AND l.book_id = {book_id}
+                  );
+                """
+                util.db.sql_insert(query_1)
+                
+                query_2 = f"""
+                UPDATE books 
+                SET book_count = book_count - 1 
+                WHERE book_id = {book_id} AND book_count > 0;
+                """
+                util.db.sql_insert(query_2)
+
+                query_3 = f"""
+                SELECT book_id, borrowed 
+                FROM logs 
+                WHERE book_id = {book_id} AND user_id = (SELECT user_id FROM users WHERE user_name = '{user_name}');
+                """
+                search_result = util.db.sql_select(query_3)
+                typer.secho(
+                    f"Thanks, {session['username']} for borrowing book {book_id}",  fg='green')
+                table_headers = ['book_id', 'status']
+                util.formating.print_table(
+                    table_headers, search_result, show_count=False)
+                typer.secho(f'')
+
     else:
         typer.secho("You need to login first.",  fg='red')
         typer.secho(f'')
 
+
+
+        
 
 @app.command("fav_book")
 def fav_book(book_id: int, user_name: str,):

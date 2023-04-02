@@ -177,8 +177,8 @@ def search_by_name(name: str):
         typer.secho(
             f'You searched for a book with the name "{name}" so here is the result:', fg='white')
 
-        table_headers = ['#', 'Book ID', 'Name',
-                         'Author', '# Pages', 'Genre', 'Availability']
+        table_headers = ['Book ID', 'Name',
+                         'Author', '# Pages', 'Genre', 'Book_Count']
         util.formating.print_table(table_headers, search_result)
         console.print('')
     else:

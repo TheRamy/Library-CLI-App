@@ -620,31 +620,31 @@ def statistics():
     else:
         typer.secho("You need to login first.",  fg='red')
 
-
 @app.command("borrow_book")
 def borrow_book(book_id: int):
     util.formating.show_header()
 
     if session:
-        typer.secho(
-            f"Hello, {session['username']}! you are logged in",  fg='green')
+        typer.secho(f"Welcome back, {session['username']}!",  fg='green')
         typer.secho('')
 
         user_name = session['username']
 
+        # Check if book is available for borrowing
         book_available = util.db.sql_select(
             f"""SELECT book_count FROM books WHERE book_id = {book_id} AND book_count > 0""")
-        
         if not book_available:
             typer.secho(f'sorry book {book_id} is not available', fg='red')
             typer.secho(f'')
         else:
+            # Check if the user has already borrowed the book
             book_already_borrowed = util.db.sql_select(
                 f"""SELECT 1 FROM logs WHERE borrowed = TRUE AND book_id = {book_id} AND user_id = (SELECT user_id FROM users WHERE user_name = '{user_name}')""")
             if book_already_borrowed:
                 typer.secho(f'you already borrowed one copy bro', fg='red')
                 typer.secho(f'')
             else:
+                # Borrow the book
                 query_1 = f"""
                 INSERT INTO logs (user_id, book_id, borrowed)
                 SELECT u.user_id, b.book_id, TRUE
@@ -660,6 +660,7 @@ def borrow_book(book_id: int):
                 """
                 util.db.sql_insert(query_1)
                 
+                # Decrement the book count
                 query_2 = f"""
                 UPDATE books 
                 SET book_count = book_count - 1 
@@ -667,6 +668,7 @@ def borrow_book(book_id: int):
                 """
                 util.db.sql_insert(query_2)
 
+                # Display the details of the borrowed book
                 query_3 = f"""
                 SELECT book_id, borrowed 
                 FROM logs 
@@ -686,7 +688,6 @@ def borrow_book(book_id: int):
 
 
 
-        
 
 @app.command("fav_book")
 def fav_book(book_id: int, user_name: str,):

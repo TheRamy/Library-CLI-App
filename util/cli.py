@@ -44,7 +44,7 @@ def cli_login(username, password):
         user_password = user[0][2]
 
         if password == user_password:  # Check if the password match the one in the database
-            typer.secho(f'Logged in! Welcome back {username}!', fg='green')
+            typer.secho(f'Logged in! Welcome back {user[0][1]}!', fg='green')
             return user[0][1] # return the user name
         else:
             typer.secho(

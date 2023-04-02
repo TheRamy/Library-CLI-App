@@ -177,8 +177,8 @@ def search_by_name(name: str):
         typer.secho(
             f'You searched for a book with the name "{name}" so here is the result:', fg='white')
 
-        table_headers = ['#', 'Book ID', 'Name',
-                         'Author', '# Pages', 'Genre', 'Availability']
+        table_headers = ['Book ID', 'Name',
+                         'Author', '# Pages', 'Genre', 'Book_Count']
         util.formating.print_table(table_headers, search_result)
         console.print('')
     else:
@@ -634,7 +634,7 @@ def borrow_book(book_id: int):
 
         book_available = util.db.sql_select(
             f"""SELECT book_count FROM books WHERE book_id = {book_id} AND book_count > 0""")
-        
+
         if not book_available:
             typer.secho(f'sorry book {book_id} is not available', fg='red')
             typer.secho(f'')
@@ -659,7 +659,7 @@ def borrow_book(book_id: int):
                   );
                 """
                 util.db.sql_insert(query_1)
-                
+
                 query_2 = f"""
                 UPDATE books 
                 SET book_count = book_count - 1 
@@ -684,9 +684,6 @@ def borrow_book(book_id: int):
         typer.secho("You need to login first.",  fg='red')
         typer.secho(f'')
 
-
-
-        
 
 @app.command("fav_book")
 def fav_book(book_id: int, user_name: str,):

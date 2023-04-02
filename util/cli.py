@@ -38,14 +38,14 @@ def cli_login(username, password):
     """Displays the cli interface whe loging in a user. ~ramy"""
 
     user = util.db.sql_select(
-        f"SELECT * from users WHERE user_name = '{username}'")
+        f"SELECT * from users WHERE lower(user_name) = lower('{username}')")
 
     if user:
         user_password = user[0][2]
 
         if password == user_password:  # Check if the password match the one in the database
             typer.secho(f'Logged in! Welcome back {username}!', fg='green')
-            return username
+            return user[0][1] # return the user name
         else:
             typer.secho(
                 f'The password for user {username} is incorrect!', fg='red')

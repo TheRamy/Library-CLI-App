@@ -24,6 +24,21 @@ def truncate_all_tables_data():
         cur.execute(f"TRUNCATE TABLE {table[0]} CASCADE;")
         conn.commit()
 
+
+    # Restart IDs and add default users
+    cur.execute("""
+        ALTER SEQUENCE users_user_id_seq RESTART WITH 1;
+        ALTER SEQUENCE books_book_id_seq RESTART WITH 100;
+        ALTER SEQUENCE logs_log_id_seq RESTART WITH 1;
+
+        INSERT INTO users (user_name, user_password) VALUES('Ramy', '123');
+        INSERT INTO users (user_name, user_password) VALUES('Tabali', '123');
+        INSERT INTO users (user_name, user_password) VALUES('Kursad', '123');
+    """)
+    conn.commit()
+
+
+
     # Close the cursor and the connection
     cur.close()
     conn.close()
@@ -31,9 +46,23 @@ def truncate_all_tables_data():
     exit()
 
 # truncate_all_tables_data()
+# exit()
 
 
-how_many_users = 0
+
+# ALTER SEQUENCE users_user_id_seq RESTART WITH 1;
+# ALTER SEQUENCE books_book_id_seq RESTART WITH 100;
+# ALTER SEQUENCE logs_log_id_seq RESTART WITH 1;
+
+# INSERT INTO users (user_name, user_password) VALUES('Ramy', '123')
+# INSERT INTO users (user_name, user_password) VALUES('Tabali', '123')
+# INSERT INTO users (user_name, user_password) VALUES('Kursad', '123')
+
+
+
+
+
+how_many_users = 4
 how_many_books = 100
 how_many_logs = how_many_books * 4
 

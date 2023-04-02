@@ -4,8 +4,12 @@
 how_many_users = 4
 how_many_books = 50
 how_many_logs = how_many_books * 4
+
+# exit() # uncomment this line manually - to prevent any accidents!
 #####################################
 #####################################
+
+
 
 from util.db import db_config
 import pytz

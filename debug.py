@@ -5,7 +5,6 @@ import psycopg2
 import inquirer
 import util.db
 
-
 console = Console()
 
 console.clear()

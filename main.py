@@ -2,6 +2,8 @@ import sys
 import install
 import time
 import typer
+import codecs
+from codecs import open
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress
@@ -56,6 +58,9 @@ def start():
     util.formating.show_header()
 
     # TODO: connect to database and create tables (if they don't exisit)
+    sqlfile = "sql-tables.sql"
+    sql = open(sqlfile, mode='r', encoding='utf-8-sig').read()
+    util.db.sql_update(sql)
 
     typer.secho(f'''Welcome to Library CLI v0.1!\n\n
         You can execute command '--help' to see the possible commands''', fg=typer.colors.GREEN)

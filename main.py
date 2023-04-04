@@ -70,7 +70,7 @@ def start():
     if tables_already_exisit:
         pass
     else:
-        typer.secho(f'''Database tables are being created...''', fg=typer.colors.GREEN)
+        typer.secho(f'''Database tables are being created...''', fg=typer.colors.YELLOW)
         sqlfile = "sql-tables.sql"
         sql = open(sqlfile, mode='r', encoding='utf-8-sig').read()
         util.db.sql_update(sql)

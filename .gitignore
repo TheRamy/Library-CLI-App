@@ -5,3 +5,5 @@
 .vscode/settings.json
 _tests.py
 cookie.json
+/venv*/
+/Venv*/

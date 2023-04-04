@@ -1,3 +1,5 @@
+import sys
+import install
 import time
 import typer
 from rich.console import Console
@@ -26,6 +28,20 @@ def main():
 
     This is a project by Team2 that can be used by a public library, school or university.
     """
+
+
+def default_command():
+
+    util.formating.show_header()
+
+    if session:
+        typer.secho(
+            f"Welcome back, {session['username']}!", fg=typer.colors.BRIGHT_YELLOW)
+        print('')
+    else:
+        typer.secho(f"You are not logged in!", fg=typer.colors.BRIGHT_YELLOW)
+        print('')
+
 
 #######################################################
 #######################################################
@@ -113,7 +129,7 @@ def start():
         book_id = typer.prompt(
             "What's the book id of the book you're returning?")
         borrow_book(book_id)
-        pass
+        
     elif answer['run_command'] == "return_book":
 
         book_id = typer.prompt(
@@ -126,8 +142,8 @@ def start():
         mark_read(book_id)
     elif answer['run_command'] == "fav_book":
 
-        # book_id = typer.prompt("What's the book id that you want marked as read?")
-        # fav_book(book_id)
+        book_id = typer.prompt("What's the book id that you want marked as read?")
+        fav_book(book_id)
         pass
     elif answer['run_command'] == "my_books":
 
@@ -432,7 +448,8 @@ def add_book():
             INSERT INTO logs (user_id, book_id, added)
             VALUES ('{user_id}', '{book_id}', True)
         """)
-        typer.echo("Book is successfully added!", fg='green')
+        typer.echo("")
+        typer.secho("Book is successfully added!", fg='green')
         typer.echo("")
 
     else:
@@ -776,4 +793,12 @@ def showme():
 
 if __name__ == "__main__":
     console.clear()  # clears the terminal of any text.
-    app()
+    # app()
+
+    # Check if a command was provided
+    if len(sys.argv) == 1:
+        # If no command was provided, run the default command
+        app(default_command()) 
+    else:
+        # Otherwise, run the provided command
+        app()

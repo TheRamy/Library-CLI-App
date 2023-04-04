@@ -58,9 +58,22 @@ def start():
     util.formating.show_header()
 
     # TODO: connect to database and create tables (if they don't exisit)
-    sqlfile = "sql-tables.sql"
-    sql = open(sqlfile, mode='r', encoding='utf-8-sig').read()
-    util.db.sql_update(sql)
+
+    tables_already_exisit = util.db.sql_select("""
+    SELECT EXISTS (
+        SELECT 1
+        FROM   information_schema.tables 
+        WHERE  table_name IN ('users', 'books', 'logs')
+    );""")
+    tables_already_exisit = tables_already_exisit[0][0]
+
+    if tables_already_exisit:
+        pass
+    else:
+        typer.secho(f'''Database tables are being created...''', fg=typer.colors.GREEN)
+        sqlfile = "sql-tables.sql"
+        sql = open(sqlfile, mode='r', encoding='utf-8-sig').read()
+        util.db.sql_update(sql)
 
     typer.secho(f'''Welcome to Library CLI v0.1!\n\n
         You can execute command '--help' to see the possible commands''', fg=typer.colors.GREEN)

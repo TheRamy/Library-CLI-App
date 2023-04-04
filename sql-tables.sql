@@ -2,7 +2,7 @@
 -- Please log an issue at https://redmine.postgresql.org/projects/pgadmin4/issues/new if you find any bugs, including reproduction steps.
 BEGIN;
 
-
+CREATE SEQUENCE IF NOT EXISTS books_book_id_seq;
 CREATE TABLE IF NOT EXISTS public.books
 (
     book_id integer NOT NULL DEFAULT nextval('books_book_id_seq'::regclass),
@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS public.books
     CONSTRAINT books_pkey PRIMARY KEY (book_id)
 );
 
+CREATE SEQUENCE IF NOT EXISTS logs_log_id_seq;
 CREATE TABLE IF NOT EXISTS public.logs
 (
     log_id integer NOT NULL DEFAULT nextval('logs_log_id_seq'::regclass),
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS public.logs
     CONSTRAINT logs_pkey PRIMARY KEY (log_id)
 );
 
+CREATE SEQUENCE IF NOT EXISTS users_user_id_seq;
 CREATE TABLE IF NOT EXISTS public.users
 (
     user_id integer NOT NULL DEFAULT nextval('users_user_id_seq'::regclass),
@@ -41,7 +43,6 @@ ALTER TABLE IF EXISTS public.logs
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
-
 
 ALTER TABLE IF EXISTS public.logs
     ADD CONSTRAINT logs_user_id_fkey FOREIGN KEY (user_id)

@@ -70,7 +70,8 @@ def start():
     if tables_already_exisit:
         pass
     else:
-        typer.secho(f'''Database tables are being created...''', fg=typer.colors.YELLOW)
+        typer.secho(f'''Database tables are being created...''',
+                    fg=typer.colors.YELLOW)
         sqlfile = "sql-tables.sql"
         sql = open(sqlfile, mode='r', encoding='utf-8-sig').read()
         util.db.sql_update(sql)
@@ -147,7 +148,7 @@ def start():
         book_id = typer.prompt(
             "What's the book id of the book you're returning?")
         borrow_book(book_id)
-        
+
     elif answer['run_command'] == "return_book":
 
         book_id = typer.prompt(
@@ -160,7 +161,8 @@ def start():
         mark_read(book_id)
     elif answer['run_command'] == "fav_book":
 
-        book_id = typer.prompt("What's the book id that you want marked as read?")
+        book_id = typer.prompt(
+            "What's the book id that you want marked as read?")
         fav_book(book_id)
         pass
     elif answer['run_command'] == "my_books":
@@ -265,7 +267,7 @@ def recently_added(genre: Optional[str] = typer.Argument(None)):
         typer.secho(
             f'Here are the 5 most recently added books in the genre "{genre}": ', fg='white')
 
-        table_headers = [ 'Book ID', 'Name', 'Author',
+        table_headers = ['Book ID', 'Name', 'Author',
                          '# Pages', 'Genre', '', 'Availability', 'Added by']
         util.formating.print_table(table_headers, search_result, [
                                    6])  # removes colum number 6
@@ -474,6 +476,7 @@ def add_book():
         typer.secho("You need to login first.",  fg='red')
         typer.echo("")
 
+
 @app.command("return_book")
 def return_book(book_id: int):
 
@@ -505,8 +508,20 @@ def return_book(book_id: int):
                 WHERE book_id = {book_id}
             """)
 
-            typer.secho(f"Thanks for returning the book!", fg='green')
+            typer.secho(
+                f"Thanks for returning the book #{book_id}:", fg='green')
             typer.secho(f"")
+
+            bookInfo = f"""
+                SELECT book_id, book_name
+                FROM books 
+                WHERE book_id = {book_id};
+                """
+            search_result = util.db.sql_select(bookInfo)
+
+            table_headers = ['Book ID', 'Name']
+            util.formating.print_table(
+                table_headers, search_result, show_count=False)
 
         else:
             typer.secho(f"This book is not borrowed by you.", fg='red')
@@ -619,7 +634,6 @@ def my_books():
                              'Author', '# Pages', 'Genre']
             util.formating.print_table(table_headers, search_result)
             typer.secho(f'')
-
 
         # Borrowed books
         # ---------------------------------------------------------------------------
@@ -737,18 +751,19 @@ def borrow_book(book_id: int):
                 """
                 util.db.sql_update(query_4)
 
-                time.sleep (1)
+                time.sleep(1)
                 # Show borrowing details
                 query_5 = f"""
-                SELECT book_id, timestamp
+                SELECT book_id, (SELECT book_name FROM books where book_id= {book_id}), timestamp
                 FROM logs 
                 WHERE book_id = {book_id} AND user_id = (SELECT user_id FROM users WHERE user_name = '{user_name}');
                 """
                 search_result = util.db.sql_select(query_5)
                 typer.secho(
                     f"Thanks for borrowing book {book_id}: ",  fg='green')
-                table_headers = ['Book ID', 'Borrowed on']
-                util.formating.print_table(table_headers, search_result, show_count=False)
+                table_headers = ['Book ID', 'Name', 'Borrowed on']
+                util.formating.print_table(
+                    table_headers, search_result, show_count=False)
 
                 typer.secho(f'')
 
@@ -806,9 +821,6 @@ def showme():
     typer.secho(f'')
 
 
-
-
-
 if __name__ == "__main__":
     console.clear()  # clears the terminal of any text.
     # app()
@@ -816,7 +828,7 @@ if __name__ == "__main__":
     # Check if a command was provided
     if len(sys.argv) == 1:
         # If no command was provided, run the default command
-        app(default_command()) 
+        app(default_command())
     else:
         # Otherwise, run the provided command
         app()

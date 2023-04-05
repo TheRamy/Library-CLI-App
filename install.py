@@ -100,19 +100,23 @@ if not APP_IS_INSTALLED:
     if Ask == "y" or Ask == "Y":
 
         print('')
-        Ask = input(f"""Do you want to install the pip modules INSIDE of a python virtual env?
-(The virtual env will be created automatically in '{VENV_NAME}' folder.)
-            (Y)es or (N)o? """)
+        Ask = input(f"""Where do you want to install the pip modules?
+        (1) Install inside a  python virtual env.
+            (The virtual env will be created automatically in '{VENV_NAME}' folder.)
+            
+        (2) Install in my global virtual env.
 
-        # If yes, then install inside venv
-        if Ask == "y" or Ask == "Y":
+            Option (1) or option (2)? """)
+
+        # If 1, then install inside venv
+        if Ask == "1":
 
             install_requirements_in_venv()
             install_config_file()
             sleep(2)
 
-        # if no, then install normally without venv
-        elif Ask == "n" or Ask == "N":
+        # if 2, then install normally without venv
+        elif Ask == "2":
             install_requirements()
             install_config_file()
             sleep(2)

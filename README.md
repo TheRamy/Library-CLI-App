@@ -36,7 +36,10 @@ To use Library CLI App, navigate to the root directory of the project and run th
     python3 main.py
 
 
-You will be presented with a series of prompts that will guide you through the process of managing your library.
+You will be presented with a series of prompts that will guide you through the process of managing your library. For more information on the available commands and their usage, run the --help command:
+
+    python3 main.py --help
+
 
 ## License
 

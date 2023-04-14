@@ -27,10 +27,41 @@ conn = psycopg2.connect(
 conn.autocommit = True
 
 
+def authenticate(username: str, password: str):
+    cursor = conn.cursor()
+    query = "SELECT * FROM public.users WHERE user_name = %s AND user_password = %s"
+    cursor.execute(query, (username, password))
+    user = cursor.fetchone()
+    cursor.close()
+    return user
+
+
+@app.post("/users/")
+def add_user(user_name: str, user_password: str):
+    cursor = conn.cursor()
+    query = """
+        INSERT INTO public.users (user_name, user_password)
+        VALUES (%s, %s)
+    """
+    cursor.execute(query, (user_name, user_password))
+    cursor.close()
+    return {"msg": "User added successfully"}
+
+
+@app.get("/logs/")
+def all_logs():
+    cursor = conn.cursor()
+    query = "SELECT * FROM public.logs ORDER BY log_id"
+    cursor.execute(query)
+    logs = cursor.fetchall()
+    cursor.close()
+    return logs
+
+
 @app.get("/books/")
 def all_books():
     cursor = conn.cursor()
-    query = "SELECT * FROM public.books"
+    query = "SELECT * FROM public.books ORDER BY book_id"
     cursor.execute(query)
     books = cursor.fetchall()
     cursor.close()
@@ -38,27 +69,45 @@ def all_books():
 
 
 @app.put("/books/{book_id}")
-def update_book(book_id: int, book: Book):
-    cursor = conn.cursor()
-    query = """
-        UPDATE public.books
-        SET book_name = %s, book_author = %s, book_number_of_pages = %s, book_genre = %s, book_count = %s
-        WHERE book_id = %s
-    """
-    cursor.execute(query, (book.book_name, book.book_author,
-                   book.book_number_of_pages, book.book_genre, book.book_count, book_id))
-    updated_rows = cursor.rowcount
-    cursor.close()
-    if updated_rows:
-        return {"msg": "Book updated successfully"}
-    raise HTTPException(status_code=404, detail="Book not found")
+def update_book(book_id: int, book: Book, username: str, password: str):
+    user = authenticate(username, password)
+    if user:
+        cursor = conn.cursor()
+        query = """
+            UPDATE public.books
+            SET book_name = %s, book_author = %s, book_number_of_pages = %s, book_genre = %s, book_count = %s
+            WHERE book_id = %s
+        """
+        cursor.execute(query, (book.book_name, book.book_author,
+                       book.book_number_of_pages, book.book_genre, book.book_count, book_id))
+        updated_rows = cursor.rowcount
+        cursor.close()
+        if updated_rows:
+            return {"msg": "Book updated successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="Book not found")
+    else:
+        raise HTTPException(
+            status_code=401, detail="Invalid username or password")
 
 
 @app.delete("/books/{book_id}")
-def delete_book(book_id: int):
+def delete_book(book_id: int, username: str, password: str):
+    # Authenticate user first
+    if not authenticate(username, password):
+        raise HTTPException(
+            status_code=401, detail="Invalid username or password")
+
     cursor = conn.cursor()
+
+    # Delete references to the book in the "logs" table
+    query = "DELETE FROM public.logs WHERE book_id = %s"
+    cursor.execute(query, (book_id,))
+
+    # Delete the book from the "books" table
     query = "DELETE FROM public.books WHERE book_id = %s"
     cursor.execute(query, (book_id,))
+
     deleted_rows = cursor.rowcount
     cursor.close()
     if deleted_rows:
@@ -67,7 +116,15 @@ def delete_book(book_id: int):
 
 
 @app.post("/books/")
-def add_book(book: Book):
+def add_book(book: Book, username: str, password: str):
+    # Auth the user
+    user = authenticate(username, password)
+
+    if not user:
+        raise HTTPException(
+            status_code=401, detail="Invalid username or password")
+
+    # Add book to database
     cursor = conn.cursor()
     query = """
         INSERT INTO public.books (book_name, book_author, book_number_of_pages, book_genre, book_count)
@@ -77,7 +134,6 @@ def add_book(book: Book):
                    book.book_number_of_pages, book.book_genre, book.book_count))
     cursor.close()
     return {"msg": "Book added successfully"}
-
 
 
 def custom_openapi():
@@ -97,6 +153,3 @@ app.openapi = custom_openapi
 
 
 uvicorn.run(app, host="0.0.0.0", port=8000)
-
-
-

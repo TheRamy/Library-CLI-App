@@ -7,3 +7,4 @@ _tests.py
 cookie.json
 /venv*/
 /Venv*/
+server.py
